@@ -1,13 +1,21 @@
 ﻿using System;
+using ArcusCli;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
-if (null == args || 0 == args.Length)
-{
-    Console.WriteLine("arguments are required");
-}
-else 
-{
-    Console.WriteLine("OK we got arguments");  
-}
 
+var serviceProvider = new ServiceCollection()
+    .AddLogging(loggingBuilder =>
+    {
+        loggingBuilder.AddConsole();
+    })
+    .AddTransient<CliConfiguration>()
+    .BuildServiceProvider();
+
+ILogger logger = serviceProvider.GetService<ILogger<Program>>();
+
+logger.LogInformation("Welcome to Arcus CLI");
+
+var cli = CliConfiguration.GetConfiguration(args, serviceProvider);
 
 return 0;
