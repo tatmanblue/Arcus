@@ -1,4 +1,4 @@
-namespace windowssvc;
+namespace ArcusWinSvc;
 
 public class Worker : BackgroundService
 {

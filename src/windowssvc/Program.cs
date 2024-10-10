@@ -1,4 +1,4 @@
-using windowssvc;
+using ArcusWinSvc;
 
 var builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddHostedService<Worker>();
