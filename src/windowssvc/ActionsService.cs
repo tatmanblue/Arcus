@@ -11,7 +11,7 @@ namespace ArcusWinSvc;
 /// </summary>
 public class ActionsServiceImpl : ActionsService.ActionsServiceBase
 {
-    public override Task<ListResponse> ExecuteCommand(ListRequest request, ServerCallContext context)
+    public override Task<ListResponse> List(ListRequest request, ServerCallContext context)
     {
         // This is just temporary implementation
         var result = $"Executed command: {request.Command}";

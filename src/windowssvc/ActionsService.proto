@@ -1,7 +1,7 @@
 ﻿syntax = "proto3";
 
 service ActionsService {
-  rpc ExecuteCommand (ListRequest) returns (ListResponse);
+  rpc List (ListRequest) returns (ListResponse);
 }
 
 message ListRequest {

@@ -27,4 +27,7 @@ Version 1 serves as POC the project is interesting enough to continue.
 | ---- | ---- |  
 | erase | simply erases a local file over writing file with 0s before deleting it |  
 
+## Tech
+[Grpc](https://learn.microsoft.com/en-us/aspnet/core/grpc/client?view=aspnetcore-8.0)  
+
 
