@@ -36,11 +36,13 @@ public class CliConfiguration
         
         switch (args[0])
         {
+            case "list":
+                runner = new ListRunner(serviceProvider.GetService<ILogger<ListRunner>>());
+                break;
             case "add":
             case "get":
             case "remove":
             case "update":
-            case "list":
             case "erase":
             case "config":
             case "help":
