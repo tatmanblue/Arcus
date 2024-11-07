@@ -17,4 +17,7 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="8.0.0" />
   </ItemGroup>
+  <ItemGroup>
+    <Protobuf Include="ActionsService.proto" GrpcServices="Server" />
+  </ItemGroup>  
 </Project>
