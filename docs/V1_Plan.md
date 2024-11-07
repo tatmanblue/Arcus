@@ -5,7 +5,7 @@ Version 1 serves as POC the project is interesting enough to continue.
 1. cmdline interface only  
 2. cmdline communicates via GRPC to windows service  
 3. windows service does all of the work  
-4. minimal instructions via markdown, no installers
+4. minimal setup instructions via markdown, no installers
 5. maybe some github actions for tests
 
 ## Tech
