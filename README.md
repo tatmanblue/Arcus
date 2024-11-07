@@ -5,9 +5,15 @@ Applications and services to securely store files
 1. [Version 1](docs/V1_Plan.md) serves as a POC    
 2. [Architecture](docs/arch.md) provides design notes, albeit rather vague atm  
 
+## Issue tracking
+
+All issues are tracked in YouTrack.   Will consider shifting to github issues, if there are public contributions.  
+1. [YouTrack](https://tatmangames.youtrack.cloud/agiles/159-6/current)  
+
 ## History
 This project is a possible reincaration or version two of [XVault](https://github.com/tatmanblue/xvault).  I never got very far with XVault and not sure why I stopped working on it.  After reading an 
-intriging real life story, recently, I started thinking about this project again.
+intriging real life story, recently, I started thinking about this project again.  XVault was an idea created 20 yrs ago around the idea of keeping data
+safe from "hackers".  Today, this idea is more relevant.
 
 
 ## Legal
@@ -16,4 +22,4 @@ If you have any questions about the content of the repository, please email [mat
 ## Status
 Ideation -- limited updates at this time -- this project is created to explore the idea.  
 
-2024.09.29
+2024.11.04

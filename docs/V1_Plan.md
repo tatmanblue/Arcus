@@ -12,14 +12,19 @@ Version 1 serves as POC the project is interesting enough to continue.
 * dotnet core for core behaviors  
 * rust for intensive stuff  
 
-## Functions
+## V1 Functions
 |  Name |  Description |  
 | ---- | ---- |  
 | add | adds a file to the vault, minimally encrypted |  
 | remove | removes a file from the vault, no confirmation, no backup |  
 | retrieve | retrieves a file from the vault |  
 | update | updates existing file in the vault |  
-| erase | simply erases the file over writing file with 0s before deleting it |  
 | config | sending a json file to configure service--what TBD |  
+| list | shows that is available in the vault |  
+
+## V1 Nice to have Functions
+|  Name |  Description |  
+| ---- | ---- |  
+| erase | simply erases a local file over writing file with 0s before deleting it |  
 
 
