@@ -21,4 +21,11 @@ message FileRecord {
   string file_name = 1;                      // The file name
   google.protobuf.Timestamp date = 2;        // The date associated with the file
   repeated string keywords = 3;              // Array of keywords
+  FileStatus status = 4;
+}
+
+enum FileStatus {
+  UNKNOWN = 0;    // Default value (required)
+  PENDING = 1;
+  VALID = 2;
 }
