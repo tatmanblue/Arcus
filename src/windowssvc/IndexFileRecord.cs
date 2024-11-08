@@ -5,6 +5,7 @@
 /// </summary>
 public class IndexFileRecord
 {
+    public string Id {get; set;} = Guid.NewGuid().ToString();
     public string ShortName { get; set; } = string.Empty;
     public string OriginFullPath { get; set; } = string.Empty;
     public DateTime Timestamp { get; set; } = DateTime.Now;
