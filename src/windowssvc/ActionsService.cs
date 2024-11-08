@@ -1,20 +1,17 @@
 ﻿using Grpc.Core;          // For gRPC core components like Server, ServerPort
-using Grpc.Net.Client;    // For creating gRPC clients (if needed)
-using Microsoft.Extensions.Hosting;  // For BackgroundService
-using System.Threading.Tasks;
+using Arcus.GRPC;
 
 
 namespace ArcusWinSvc;
 
 /// <summary>
-/// 
+///  GRPC interface for receiving commands from other processes like the ArcusCLI
 /// </summary>
 public class ActionsServiceImpl : ActionsService.ActionsServiceBase
 {
     public override Task<ListResponse> List(ListRequest request, ServerCallContext context)
     {
-        // This is just temporary implementation
-        var result = $"Executed command: {request.Command}";
-        return Task.FromResult(new ListResponse { Result = result });
+        // This is just temporary implementation        
+        return Task.FromResult(new ListResponse { Count = 0 });
     }
 }
