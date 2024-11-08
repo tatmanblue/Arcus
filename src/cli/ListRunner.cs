@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Grpc.Net.Client;
+using Arcus.GRPC;
 
 namespace ArcusCli;
 public class ListRunner : IArgumentRunner
@@ -19,10 +20,10 @@ public class ListRunner : IArgumentRunner
         var client = new ActionsService.ActionsServiceClient(channel);
         var listRequest = new ListRequest()
         {
-            Command = "test"
+            FiltersJson = string.Empty
         };
         
         var reply = client.List(listRequest);
-        logger.LogInformation("Arcus Service says: " + reply.Result);
+        logger.LogInformation($"Arcus Service reports {reply.Count} files found");
     }
 }

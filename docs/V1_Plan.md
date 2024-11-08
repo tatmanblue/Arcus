@@ -29,5 +29,6 @@ Version 1 serves as POC the project is interesting enough to continue.
 
 ## Tech
 [Grpc](https://learn.microsoft.com/en-us/aspnet/core/grpc/client?view=aspnetcore-8.0)  
+[Grpic Wrapper](https://github.com/protobuf-net/protobuf-net.Grpc)  
 
-
+Project structure is defined on as AS NEEDED basis.  This means it may not always follow best practices.  Get over it.
