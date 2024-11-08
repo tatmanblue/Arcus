@@ -33,7 +33,7 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
                 Date = timestamp,
                 Status = (Arcus.GRPC.FileStatus)record.Status,
             };
-            fileRecord.Keywords.Add(record.Keywords);
+            fileRecord.Keywords.AddRange(record.Keywords);
             response.Files.Add(fileRecord);
         }
         

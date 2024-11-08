@@ -28,4 +28,5 @@ enum FileStatus {
   UNKNOWN = 0;    // Default value (required)
   PENDING = 1;
   VALID = 2;
+  ERROR = 3;
 }

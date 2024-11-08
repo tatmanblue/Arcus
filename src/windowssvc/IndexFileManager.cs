@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using System.Collections.Concurrent;
+using Newtonsoft.Json;
 
 namespace ArcusWinSvc;
 
@@ -11,7 +12,7 @@ namespace ArcusWinSvc;
 /// </summary>
 public class IndexFileManager
 {
-    private List<IndexFileRecord> records = new ();
+    private ConcurrentBag<IndexFileRecord> records = new ();
     private ILogger<IndexFileManager> logger;
     
     public IndexFileManager(ILogger<IndexFileManager> logger)
@@ -20,7 +21,7 @@ public class IndexFileManager
         string indexFile = $"{GetIndexFilePath()}\\index.index";
         if (!File.Exists(indexFile)) return;
         string fileData = File.ReadAllText(indexFile);
-        records = JsonConvert.DeserializeObject<List<IndexFileRecord>>(fileData);
+        records = JsonConvert.DeserializeObject<ConcurrentBag<IndexFileRecord>>(fileData);
         this.logger.LogInformation($"Loaded {records.Count} records");
     }
 
