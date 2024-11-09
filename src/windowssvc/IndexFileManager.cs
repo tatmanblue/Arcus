@@ -15,25 +15,52 @@ public class IndexFileManager
     private ConcurrentBag<IndexFileRecord> records = new ();
     private ILogger<IndexFileManager> logger;
     
+    private static readonly object _lock = new object();
+    
     public IndexFileManager(ILogger<IndexFileManager> logger)
     {
         this.logger = logger;
-        string indexFile = $"{GetIndexFilePath()}\\index.index";
-        if (!File.Exists(indexFile)) return;
+        string indexFile = GetIndexFile();
+        if (!File.Exists(indexFile))
+        {
+            string fullPath = GetIndexLocation();
+            logger.LogInformation($"Creating directory: {fullPath}");
+            if (!Directory.Exists(fullPath))
+                Directory.CreateDirectory(fullPath);
+            return;
+        }
         string fileData = File.ReadAllText(indexFile);
         records = JsonConvert.DeserializeObject<ConcurrentBag<IndexFileRecord>>(fileData);
         this.logger.LogInformation($"Loaded {records.Count} records");
     }
 
-    private string GetIndexFilePath()
+    private string GetIndexLocation()
     {
-        var path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        var path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
         return Path.Combine(path, @"Arcus FS");
+    }
+    
+    private string GetIndexFile()
+    {
+
+        return $"{GetIndexLocation()}\\index.txt";
     }
 
     public List<IndexFileRecord> GetAllRecords()
     {
         // make a copy so that other processes do not change consumer use
         return records.ToList();
+    }
+
+    public void AddRecord(IndexFileRecord record)
+    {
+        lock (_lock)
+        {
+            // TODO will need to deal with concurency
+            records.Add(record);
+            string indexFile = GetIndexFile();
+            string json = JsonConvert.SerializeObject(records);
+            File.WriteAllText(indexFile, json);
+        }
     }
 }

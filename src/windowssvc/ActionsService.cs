@@ -42,7 +42,23 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
     
     public override Task<AddResponse> Add(AddRequest request, ServerCallContext context)
     {
-        var response = new AddResponse();
+        // TODO need to validation, shadow data etc
+        // TODO need to actually copy the file to storage
+
+        IndexFileRecord addRecord = new IndexFileRecord()
+        {
+            ShortName = request.ShortName,
+            OriginFullPath = request.OriginFullPath,
+            Status = FileStatuses.VALID
+        };
+        
+        indexManager.AddRecord(addRecord);
+        
+        var response = new AddResponse()
+        {
+            Status = (Arcus.GRPC.FileStatuses) addRecord.Status,
+            Id = addRecord.Id
+        };
         
         return Task.FromResult(response);
     }

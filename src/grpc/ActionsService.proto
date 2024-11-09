@@ -20,7 +20,7 @@ message ListResponse {
 
 message AddRequest {
   string short_name = 1;
-  string origin_name = 2;
+  string origin_full_path = 2;
   repeated string keywords = 3;
 }
 

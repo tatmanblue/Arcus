@@ -36,7 +36,7 @@ public class AddRunner : AbstractBaseRunner<AddRunner>
         var request = new AddRequest()
         {
             ShortName = shortName,
-            OriginName = fullFilePath,
+            OriginFullPath = fullFilePath,
         };
         
         var response = client.Add(request);
