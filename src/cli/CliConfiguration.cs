@@ -34,12 +34,20 @@ public class CliConfiguration
         
         if (args.Length == 0) return runner;
         
-        switch (args[0])
+        string command = args[0];
+        string[] cmdArgs = args.Skip(1).ToArray();
+        
+        ILogger<CliConfiguration> logger = serviceProvider.GetService<ILogger<CliConfiguration>>();
+        logger.LogInformation($"Array Len: {args.Length} for Command: {command} - CMDARGS arguments: {string.Join(" ", cmdArgs)}");
+        
+        switch (command)
         {
             case "list":
                 runner = new ListRunner(serviceProvider.GetService<ILogger<ListRunner>>());
                 break;
             case "add":
+                runner = new AddRunner(serviceProvider.GetService<ILogger<AddRunner>>(), cmdArgs);
+                break;
             case "get":
             case "remove":
             case "update":

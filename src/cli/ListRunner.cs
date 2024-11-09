@@ -24,6 +24,9 @@ public class ListRunner : IArgumentRunner
         };
         
         var reply = client.List(listRequest);
+        
+        // TODO: gotta output the results
+        
         logger.LogInformation($"Arcus Service reports {reply.Count} files found");
     }
 }

@@ -1,5 +1,7 @@
 # Arcus
-Applications and services to securely store files
+Applications and services to securely store files, accessed remotely and locally.  
+
+
 
 ## Versions, ideas, plans
 1. [Version 1](docs/V1_Plan.md) serves as a POC    
