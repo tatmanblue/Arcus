@@ -12,12 +12,15 @@ public abstract class AbstractBaseRunner<T> : IDisposable, IArgumentRunner where
 {
     protected ILogger<T> logger;
     protected readonly GrpcChannel channel;
-    protected readonly ActionsService.ActionsServiceClient client;    
+    protected readonly ActionsService.ActionsServiceClient client;
+    protected string[] args; 
+    
     public abstract CliCommand Command { get; }
 
-    public AbstractBaseRunner(ILogger<T> logger)
+    public AbstractBaseRunner(ILogger<T> logger, string[] args)
     {
         this.logger = logger;
+        this.args = args;
         channel = GrpcChannel.ForAddress("http://localhost:5001");
         client = new ActionsService.ActionsServiceClient(channel);
     }
@@ -26,7 +29,7 @@ public abstract class AbstractBaseRunner<T> : IDisposable, IArgumentRunner where
     
     /// <summary>
     /// IDisposable Implementation suggestion taken from CodeRabbitAI
-    /// seems like overkill but aint going to worry about it atm
+    /// seems like overkill but ain't going to worry about it atm
     /// </summary>
     public void Dispose()
     {

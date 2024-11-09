@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Grpc.Net.Client;
 using Arcus.GRPC;
 
 namespace ArcusCli;
@@ -7,7 +6,7 @@ namespace ArcusCli;
 /// <summary>
 /// Queries the service for the files it maintains
 /// </summary>
-public class ListRunner(ILogger<ListRunner> logger) : AbstractBaseRunner<ListRunner>(logger)
+public class ListRunner(ILogger<ListRunner> logger) : AbstractBaseRunner<ListRunner>(logger, [])
 {
     public override CliCommand Command { get; } = CliCommand.List;
 
