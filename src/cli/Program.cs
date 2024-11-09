@@ -16,15 +16,29 @@ var serviceProvider = new ServiceCollection()
 
 ILogger logger = serviceProvider.GetService<ILogger<Program>>();
 logger.LogInformation("Welcome to Arcus CLI");
+int ret = 1;
 
 try
 {
+    
+    logger.LogDebug($"RECEIVED arguments: {string.Join(" ", args)}");
+    
     CliConfiguration.GetConfiguration(args, serviceProvider).Runner.Run();
     logger.LogInformation("Good bye");
-    return 0;
+    ret = 0;
+}
+catch (CliInvalidInputException iEx)
+{
+    logger.LogWarning(iEx.Message);
+}
+catch (CliArgumentException)
+{
+    // force the help output
+    logger.LogInformation(HelpRunner.GetHelp());
 }
 catch (Exception ex)
 {
-    logger.LogError(ex, "Arcus CLI failed."); 
-    return 1; 
+    logger.LogError(ex, $"Arcus CLI failed. {ex.GetType().Name}"); 
 }
+
+return ret;

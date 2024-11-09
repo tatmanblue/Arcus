@@ -31,11 +31,34 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
             {
                 FileName = record.ShortName,
                 Date = timestamp,
-                Status = (Arcus.GRPC.FileStatus)record.Status,
+                Status = (Arcus.GRPC.FileStatuses)record.Status,
             };
             fileRecord.Keywords.AddRange(record.Keywords);
             response.Files.Add(fileRecord);
         }
+        
+        return Task.FromResult(response);
+    }
+    
+    public override Task<AddResponse> Add(AddRequest request, ServerCallContext context)
+    {
+        // TODO need to validation, shadow data etc
+        // TODO need to actually copy the file to storage
+
+        IndexFileRecord addRecord = new IndexFileRecord()
+        {
+            ShortName = request.ShortName,
+            OriginFullPath = request.OriginFullPath,
+            Status = FileStatuses.VALID
+        };
+        
+        indexManager.AddRecord(addRecord);
+        
+        var response = new AddResponse()
+        {
+            Status = (Arcus.GRPC.FileStatuses) addRecord.Status,
+            Id = addRecord.Id
+        };
         
         return Task.FromResult(response);
     }
