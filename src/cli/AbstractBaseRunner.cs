@@ -8,7 +8,7 @@ namespace ArcusCli;
 /// Since most runners will be accessing the service, the base class
 /// can contain some of the share behaviors
 /// </summary>
-public abstract class AbstractBaseRunner<T> : IArgumentRunner where T: IArgumentRunner
+public abstract class AbstractBaseRunner<T> : IDisposable, IArgumentRunner where T: IArgumentRunner
 {
     protected ILogger<T> logger;
     protected readonly GrpcChannel channel;
@@ -23,5 +23,22 @@ public abstract class AbstractBaseRunner<T> : IArgumentRunner where T: IArgument
     }
 
     public abstract void Run();
+    
+    /// <summary>
+    /// IDisposable Implementation suggestion taken from CodeRabbitAI
+    /// seems like overkill but aint going to worry about it atm
+    /// </summary>
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
 
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            channel?.Dispose();
+        }
+    }
 }

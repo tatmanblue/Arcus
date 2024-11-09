@@ -29,6 +29,10 @@ public class IndexFileManager
                 Directory.CreateDirectory(fullPath);
             return;
         }
+        
+        // TODO File operations and JSON deserialization should be wrapped in try-catch blocks to
+        // TODO handle potential exceptions gracefully.  See code reviews for PR
+        // https://github.com/tatmanblue/Arcus/pull/5
         string fileData = File.ReadAllText(indexFile);
         records = JsonConvert.DeserializeObject<ConcurrentBag<IndexFileRecord>>(fileData);
         this.logger.LogInformation($"Loaded {records.Count} records");
@@ -56,7 +60,6 @@ public class IndexFileManager
     {
         lock (_lock)
         {
-            // TODO will need to deal with concurency
             records.Add(record);
             string indexFile = GetIndexFile();
             string json = JsonConvert.SerializeObject(records);
