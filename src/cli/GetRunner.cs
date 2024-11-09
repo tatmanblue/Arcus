@@ -14,11 +14,19 @@ public class GetRunner(ILogger<GetRunner> logger, string[] args) :
             throw new CliArgumentException();
         
         logger.LogDebug($"Get arguments: {string.Join(" ", args)}");
-        string id = args[0];
 
+        var parser = new ArgumentParser(args);
+        
+        string id = parser.GetArgument<string>("id");
+        string path = parser.GetArgument<string>("path");
+        
+        if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(path))
+            throw new CliArgumentException();
+        
         var request = new GetRequest()
         {
-            Id = id
+            Id = id,
+            DestinationPath = path
         };
         
         var response = client.Get(request);

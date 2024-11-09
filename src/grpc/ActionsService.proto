@@ -37,6 +37,7 @@ message GetRequest {
 
 message GetResponse {
   bool success = 1;
+  string result_full_path = 2;
 }
 
 message FileRecord {

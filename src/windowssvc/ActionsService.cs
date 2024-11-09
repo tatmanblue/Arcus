@@ -73,7 +73,8 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
         
         IndexFileRecord record = indexManager.GetRecord(request.Id);
 
-        response.Success = true;
+        if (null != record)
+            response.Success = true;
         
         return Task.FromResult(response);
     }
