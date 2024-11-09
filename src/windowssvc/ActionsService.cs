@@ -29,6 +29,7 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
             Timestamp timestamp = Timestamp.FromDateTime(record.Timestamp.ToUniversalTime());
             var fileRecord = new FileRecord()
             {
+                Id = record.Id,
                 FileName = record.ShortName,
                 Date = timestamp,
                 Status = (Arcus.GRPC.FileStatuses)record.Status,
@@ -59,6 +60,20 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
             Status = (Arcus.GRPC.FileStatuses) addRecord.Status,
             Id = addRecord.Id
         };
+        
+        return Task.FromResult(response);
+    }
+
+    public override Task<GetResponse> Get(GetRequest request, ServerCallContext context)
+    {
+        var response = new GetResponse()
+        {
+            Success = false
+        };
+        
+        IndexFileRecord record = indexManager.GetRecord(request.Id);
+
+        response.Success = true;
         
         return Task.FromResult(response);
     }

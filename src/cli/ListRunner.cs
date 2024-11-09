@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Text;
+using Microsoft.Extensions.Logging;
 using Arcus.GRPC;
 
 namespace ArcusCli;
@@ -19,11 +20,16 @@ public class ListRunner(ILogger<ListRunner> logger) : AbstractBaseRunner<ListRun
         
         var reply = client.List(listRequest);
         
+        StringBuilder builder = new StringBuilder();
+        builder.AppendLine($"Arcus Service reports {reply.Count} files found");
+        builder.AppendLine($"{"Id", -10} {"Name", -20}");
+        builder.AppendLine($"-------    ---------------------------------------------");
+        
         foreach(FileRecord record in reply.Files)
         {
-            logger.LogInformation($"File: {record.FileName}");
+            builder.AppendLine($"{record.Id, -10} {record.FileName, -20}");
         }
         
-        logger.LogInformation($"Arcus Service reports {reply.Count} files found");
+        logger.LogInformation(builder.ToString());
     }
 }
