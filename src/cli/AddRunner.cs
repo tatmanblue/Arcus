@@ -3,6 +3,9 @@ using Arcus.GRPC;
 
 namespace ArcusCli;
 
+/// <summary>
+/// AddRunner gives file information to the service for it to store
+/// </summary>
 public class AddRunner : AbstractBaseRunner<AddRunner>
 {
     public override CliCommand Command { get; } = CliCommand.Add;
@@ -40,7 +43,6 @@ public class AddRunner : AbstractBaseRunner<AddRunner>
         };
         
         var response = client.Add(request);
-        
         
         logger.LogInformation($"File {shortName} is added. Id = {response.Id}");
     }

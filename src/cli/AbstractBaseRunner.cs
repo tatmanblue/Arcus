@@ -5,7 +5,7 @@ using Arcus.GRPC;
 namespace ArcusCli;
 
 /// <summary>
-/// Since most runnners will be accessing the service, the base class
+/// Since most runners will be accessing the service, the base class
 /// can contain some of the share behaviors
 /// </summary>
 public abstract class AbstractBaseRunner<T> : IArgumentRunner where T: IArgumentRunner
