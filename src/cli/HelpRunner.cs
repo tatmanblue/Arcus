@@ -18,6 +18,11 @@ public class HelpRunner : IArgumentRunner
     public CliCommand Command { get; } = CliCommand.Help;
     
     public void Run()
+    {       
+        logger.LogInformation(HelpRunner.GetHelp());
+    }
+    
+    public static string GetHelp()
     {
         StringBuilder builder = new();
         builder.AppendLine("Usage:");
@@ -29,6 +34,6 @@ public class HelpRunner : IArgumentRunner
         builder.AppendLine("  erase {filename}");
         builder.AppendLine("  config {json config file}");
         
-        logger.LogInformation(builder.ToString());
+        return builder.ToString();
     }
 }

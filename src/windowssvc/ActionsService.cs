@@ -31,11 +31,18 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
             {
                 FileName = record.ShortName,
                 Date = timestamp,
-                Status = (Arcus.GRPC.FileStatus)record.Status,
+                Status = (Arcus.GRPC.FileStatuses)record.Status,
             };
             fileRecord.Keywords.AddRange(record.Keywords);
             response.Files.Add(fileRecord);
         }
+        
+        return Task.FromResult(response);
+    }
+    
+    public override Task<AddResponse> Add(AddRequest request, ServerCallContext context)
+    {
+        var response = new AddResponse();
         
         return Task.FromResult(response);
     }

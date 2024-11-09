@@ -34,7 +34,7 @@ catch (CliInvalidInputException iEx)
 catch (CliArgumentException)
 {
     // force the help output
-    CliConfiguration.GetConfiguration(new []{CliCommand.Help.ToString()}, serviceProvider).Runner.Run();
+    logger.LogInformation(HelpRunner.GetHelp());
 }
 catch (Exception ex)
 {

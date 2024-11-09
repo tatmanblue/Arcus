@@ -3,21 +3,16 @@ using Grpc.Net.Client;
 using Arcus.GRPC;
 
 namespace ArcusCli;
-public class ListRunner : IArgumentRunner
-{
-    private ILogger<ListRunner> logger;
-    
-    public CliCommand Command { get; } = CliCommand.List;
 
-    public ListRunner(ILogger<ListRunner> logger)
+/// <summary>
+/// Queries the service for the files it maintains
+/// </summary>
+public class ListRunner(ILogger<ListRunner> logger) : AbstractBaseRunner<ListRunner>(logger)
+{
+    public override CliCommand Command { get; } = CliCommand.List;
+
+    public override void Run()
     {
-        this.logger = logger;
-    }
-    
-    public void Run()
-    {
-        using var channel = GrpcChannel.ForAddress("http://localhost:5001");
-        var client = new ActionsService.ActionsServiceClient(channel);
         var listRequest = new ListRequest()
         {
             FiltersJson = string.Empty
@@ -25,7 +20,10 @@ public class ListRunner : IArgumentRunner
         
         var reply = client.List(listRequest);
         
-        // TODO: gotta output the results
+        foreach(FileRecord record in reply.Files)
+        {
+            logger.LogInformation($"File: {record.FileName}");
+        }
         
         logger.LogInformation($"Arcus Service reports {reply.Count} files found");
     }

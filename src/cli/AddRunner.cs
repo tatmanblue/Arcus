@@ -1,21 +1,21 @@
 ﻿using Microsoft.Extensions.Logging;
+using Arcus.GRPC;
 
 namespace ArcusCli;
 
-public class AddRunner : IArgumentRunner
+public class AddRunner : AbstractBaseRunner<AddRunner>
 {
-    public CliCommand Command { get; } = CliCommand.Add;
-
-    private ILogger<AddRunner> logger;
+    public override CliCommand Command { get; } = CliCommand.Add;
+    
     private string[] args; 
 
-    public AddRunner(ILogger<AddRunner> logger, string[] args)
+    public AddRunner(ILogger<AddRunner> logger, string[] args) : base(logger)
     {
         this.logger = logger;
         this.args = args;
     }
     
-    public void Run()
+    public override void Run()
     {
         logger.LogDebug("Running add");
         
@@ -31,7 +31,17 @@ public class AddRunner : IArgumentRunner
             throw new CliInvalidInputException($"file {fileName} not found");
         
         string fullFilePath = Path.GetFullPath(fileName);
+        string shortName = Path.GetFileName(fullFilePath);
         
-        logger.LogInformation($"adding file {fileName}/'{fullFilePath}'");
+        var request = new AddRequest()
+        {
+            ShortName = shortName,
+            OriginName = fullFilePath,
+        };
+        
+        var response = client.Add(request);
+        
+        
+        logger.LogInformation($"File {shortName} is added. Id = {response.Id}");
     }
 }
