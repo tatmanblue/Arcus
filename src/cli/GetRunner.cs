@@ -23,10 +23,15 @@ public class GetRunner(ILogger<GetRunner> logger, string[] args) :
         if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(path))
             throw new CliArgumentException();
         
+        string fullFilePath = Path.GetFullPath(path);
+        
+        if (false == Directory.Exists(fullFilePath))
+            throw new CliInvalidInputException("Path does not exist");
+        
         var request = new GetRequest()
         {
             Id = id,
-            DestinationPath = path
+            DestinationPath = fullFilePath
         };
         
         var response = client.Get(request);

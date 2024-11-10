@@ -4,7 +4,10 @@ using Microsoft.Extensions.Logging;
 namespace ArcusCli;
 
 /// <summary>
-/// 
+/// Displays the cmd line help information.
+/// TODO: candidate for removal.  Instead of a runner when cmd
+/// TODO: isn't found, throw exception print out help since
+/// TODO: commands that have invalid inputs do that anyways
 /// </summary>
 public class HelpRunner : IArgumentRunner
 {
@@ -31,8 +34,8 @@ public class HelpRunner : IArgumentRunner
         builder.AppendLine("  list");
         builder.AppendLine("  remove {id}");
         builder.AppendLine("  update {filename}");
-        builder.AppendLine("  erase {filename}");
-        builder.AppendLine("  config {json config file}");
+        // builder.AppendLine("  erase {filename}");
+        // builder.AppendLine("  config {json config file}");
         
         return builder.ToString();
     }

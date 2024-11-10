@@ -16,6 +16,14 @@ public class ArgumentParser
         arguments = ParseArguments(args);
     }
 
+    /// <summary>
+    /// returns value of key in the argument array if it exists, otherwise
+    /// returns the default
+    /// </summary>
+    /// <param name="name">key name</param>
+    /// <param name="defaultValue">default</param>
+    /// <typeparam name="T">type, value types only</typeparam>
+    /// <returns>default or value found</returns>
     public T GetArgument<T>(string name, T defaultValue = default(T))
     {
         T ret = defaultValue;
