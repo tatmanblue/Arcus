@@ -12,11 +12,14 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
 {
     private ILogger<ActionsServiceImpl> logger;
     private IndexFileManager indexManager;
+    private LocalDataStore localDataStore;
 
-    public ActionsServiceImpl(ILogger<ActionsServiceImpl> logger, IndexFileManager indexManager)
+    public ActionsServiceImpl(ILogger<ActionsServiceImpl> logger, 
+        IndexFileManager indexManager, LocalDataStore localDataStore)
     {
         this.logger = logger;
         this.indexManager = indexManager;
+        this.localDataStore = localDataStore;
     }
     
     public override Task<ListResponse> List(ListRequest request, ServerCallContext context)
@@ -29,6 +32,7 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
             Timestamp timestamp = Timestamp.FromDateTime(record.Timestamp.ToUniversalTime());
             var fileRecord = new FileRecord()
             {
+                Id = record.Id,
                 FileName = record.ShortName,
                 Date = timestamp,
                 Status = (Arcus.GRPC.FileStatuses)record.Status,
@@ -49,9 +53,12 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
         {
             ShortName = request.ShortName,
             OriginFullPath = request.OriginFullPath,
-            Status = FileStatuses.VALID
+            Status = FileStatuses.PENDING
         };
         
+        localDataStore.AddRequest(addRecord);
+        
+        addRecord.Status = FileStatuses.VALID;
         indexManager.AddRecord(addRecord);
         
         var response = new AddResponse()
@@ -60,6 +67,24 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
             Id = addRecord.Id
         };
         
+        return Task.FromResult(response);
+    }
+
+    public override Task<GetResponse> Get(GetRequest request, ServerCallContext context)
+    {
+        var response = new GetResponse()
+        {
+            Success = false
+        };
+        
+        IndexFileRecord record = indexManager.GetRecord(request.Id);
+
+        if (null != record)
+        {
+            response.ResultFullPath = localDataStore.GetRequest(record, request.DestinationPath);
+            response.Success = true;
+        }
+
         return Task.FromResult(response);
     }
 }

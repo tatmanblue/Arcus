@@ -9,7 +9,7 @@ public class IndexFileRecord
     /// for uniquely identifying a record allowing short name to not necessarily
     /// be a conflict
     /// </summary>
-    public string Id {get; set;} = Guid.NewGuid().ToString();
+    public string Id {get; set;} = Guid.NewGuid().ToString().Substring(0, 8);
     /// <summary>
     /// just the file name
     /// </summary>

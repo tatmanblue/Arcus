@@ -6,18 +6,11 @@ namespace ArcusCli;
 /// <summary>
 /// AddRunner gives file information to the service for it to store
 /// </summary>
-public class AddRunner : AbstractBaseRunner<AddRunner>
+public class AddRunner(ILogger<AddRunner> logger, string[] args) 
+    : AbstractBaseRunner<AddRunner>(logger, args)
 {
     public override CliCommand Command { get; } = CliCommand.Add;
-    
-    private string[] args; 
 
-    public AddRunner(ILogger<AddRunner> logger, string[] args) : base(logger)
-    {
-        this.logger = logger;
-        this.args = args;
-    }
-    
     public override void Run()
     {
         logger.LogDebug("Running add");

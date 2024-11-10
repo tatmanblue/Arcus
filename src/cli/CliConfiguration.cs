@@ -49,6 +49,8 @@ public class CliConfiguration
                 runner = new AddRunner(serviceProvider.GetService<ILogger<AddRunner>>(), cmdArgs);
                 break;
             case "get":
+                runner = new GetRunner(serviceProvider.GetService<ILogger<GetRunner>>(), cmdArgs);
+                break;
             case "remove":
             case "update":
             case "erase":

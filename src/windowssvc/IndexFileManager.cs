@@ -56,6 +56,11 @@ public class IndexFileManager
         return records.ToList();
     }
 
+    public IndexFileRecord GetRecord(string id)
+    {
+        return records.FirstOrDefault(x => x.Id == id);
+    }
+
     public void AddRecord(IndexFileRecord record)
     {
         lock (_lock)
