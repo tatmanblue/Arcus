@@ -97,10 +97,10 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
         
         IndexFileRecord record = indexManager.GetRecord(request.Id);
 
-        if (null != record)
+        if (null != record && localDataStore.RemoveRequest(record))
         {
             indexManager.RemoveRecord(record);
-            response.Success = localDataStore.RemoveRequest(record);
+            response.Success = true;
         }
         
         return Task.FromResult(response);

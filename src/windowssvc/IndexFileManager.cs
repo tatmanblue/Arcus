@@ -85,18 +85,15 @@ public class IndexFileManager
     {
         lock (_lock)
         {
-            ConcurrentBag<IndexFileRecord> updatedBag = new();
-            foreach (IndexFileRecord ifr in records)
+            var updatedRecords = records.Where(r => r.Id != record.Id).ToList();
+            if (records.Count == updatedRecords.Count)
             {
-                if (ifr.Id == record.Id)
-                {
-                    logger.LogInformation($"Removing record {ifr.Id}");
-                    continue;
-                }
-                updatedBag.Add(ifr);
+                logger.LogWarning($"Record {record.Id} not found for removal");
+                return;
             }
-
-            records = updatedBag;
+                       
+            logger.LogInformation($"Removing record {record.Id}");
+            records = new ConcurrentBag<IndexFileRecord>(updatedRecords);
             SaveIndexFile();
         }
     }
