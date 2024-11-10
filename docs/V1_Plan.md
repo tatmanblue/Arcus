@@ -1,5 +1,7 @@
 # Version 1
 
+__Status:__ Consider this complete as all V1 functions are complete.   Files are maintained in the service albeit with no security
+
 Version 1 serves as POC the project is interesting enough to continue.
 
 1. cmdline interface only  
@@ -18,12 +20,12 @@ Version 1 serves as POC the project is interesting enough to continue.
 | add | adds a file to the vault, minimally encrypted |  
 | remove | removes a file from the vault, no confirmation, no backup |  
 | get | retrieves a file from the vault |  
-| update | updates existing file in the vault |  
 | list | shows that is available in the vault |  
 
 ## V1 Nice to have Functions
 |  Name |  Description |  
 | ---- | ---- |  
+| update | updates existing file in the vault |  
 | erase | simply erases a local file over writing file with 0s before deleting it |  
 | config | sending a json file to configure service--what TBD |  
 

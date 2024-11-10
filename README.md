@@ -4,8 +4,9 @@ Applications and services to securely store files, accessed remotely and locally
 
 
 ## Versions, ideas, plans
-1. [Version 1](docs/V1_Plan.md) serves as a POC    
-2. [Architecture](docs/arch.md) provides design notes, albeit rather vague atm  
+1. [Version 1](docs/V1_Plan.md) serves as a POC.  Calling this ___DONE___
+2. [Version 2](docs/V2_Plan.md) Whats next?      
+3. [Architecture](docs/arch.md) provides design notes, albeit rather vague atm  
 
 ## Issue tracking
 
@@ -24,4 +25,4 @@ If you have any questions about the content of the repository, please email [mat
 ## Status
 Ideation -- limited updates at this time -- this project is created to explore the idea.  
 
-2024.11.04
+2024.11.10
