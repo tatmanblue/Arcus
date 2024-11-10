@@ -39,4 +39,21 @@ public class LocalDataStore
         var rootLocation = Path.Combine(path, @"Arcus FS");
         return Path.Combine(rootLocation, @"Data Store");
     }
+
+    public bool RemoveRequest(IndexFileRecord record)
+    {
+        var dir = $"{GetStoreLocation()}\\{record.Id}";
+        if (false == Directory.Exists(dir))
+            throw new DirectoryNotFoundException();
+        
+        string file = $"{dir}\\{record.Id}.file";
+        
+        if (false == File.Exists(file))
+            throw new FileNotFoundException();
+        
+        File.Delete(file);
+        Directory.Delete(dir);
+        
+        return true;
+    }
 }
