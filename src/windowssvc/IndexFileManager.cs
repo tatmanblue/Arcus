@@ -50,6 +50,17 @@ public class IndexFileManager
         return $"{GetIndexLocation()}\\index.txt";
     }
 
+    /// <summary>
+    /// Caller must ensure thread safety
+    /// </summary>
+    private void SaveIndexFile()
+    {
+        string indexFile = GetIndexFile();
+        string json = JsonConvert.SerializeObject(records);
+        logger.LogInformation($"Saving index file: {indexFile}");
+        File.WriteAllText(indexFile, json);
+    }
+
     public List<IndexFileRecord> GetAllRecords()
     {
         // make a copy so that other processes do not change consumer use
@@ -66,9 +77,24 @@ public class IndexFileManager
         lock (_lock)
         {
             records.Add(record);
-            string indexFile = GetIndexFile();
-            string json = JsonConvert.SerializeObject(records);
-            File.WriteAllText(indexFile, json);
+            SaveIndexFile();
+        }
+    }
+
+    public void RemoveRecord(IndexFileRecord record)
+    {
+        lock (_lock)
+        {
+            var updatedRecords = records.Where(r => r.Id != record.Id).ToList();
+            if (records.Count == updatedRecords.Count)
+            {
+                logger.LogWarning($"Record {record.Id} not found for removal");
+                return;
+            }
+                       
+            logger.LogInformation($"Removing record {record.Id}");
+            records = new ConcurrentBag<IndexFileRecord>(updatedRecords);
+            SaveIndexFile();
         }
     }
 }

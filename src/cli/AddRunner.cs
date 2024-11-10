@@ -19,7 +19,10 @@ public class AddRunner(ILogger<AddRunner> logger, string[] args)
             throw new CliArgumentException();
         
         logger.LogDebug($"Add arguments: {string.Join(" ", args)}");
-        string fileName = args[0];
+        
+        var parser = new ArgumentParser(args);
+        
+        string fileName = parser.GetArgument<string>("file");
         if (string.IsNullOrEmpty(fileName))
             throw new CliArgumentException();
 

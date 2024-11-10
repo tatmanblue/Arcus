@@ -87,4 +87,22 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
 
         return Task.FromResult(response);
     }
+
+    public override Task<RemoveResponse> Remove(RemoveRequest request, ServerCallContext context)
+    {
+        var response = new RemoveResponse()
+        {
+            Success = false
+        };
+        
+        IndexFileRecord record = indexManager.GetRecord(request.Id);
+
+        if (null != record && localDataStore.RemoveRequest(record))
+        {
+            indexManager.RemoveRecord(record);
+            response.Success = true;
+        }
+        
+        return Task.FromResult(response);
+    }
 }

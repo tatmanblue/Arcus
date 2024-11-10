@@ -29,13 +29,11 @@ public class HelpRunner : IArgumentRunner
     {
         StringBuilder builder = new();
         builder.AppendLine("Usage:");
-        builder.AppendLine("  add {filename}");
+        builder.AppendLine("  add --file={filename}");
         builder.AppendLine("  get --id={id} --path={path}");
         builder.AppendLine("  list");
-        builder.AppendLine("  remove {id}");
-        builder.AppendLine("  update {filename}");
-        // builder.AppendLine("  erase {filename}");
-        // builder.AppendLine("  config {json config file}");
+        builder.AppendLine("  remove --id={id}");
+        builder.AppendLine("  update --id={id}");
         
         return builder.ToString();
     }

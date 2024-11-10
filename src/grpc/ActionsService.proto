@@ -8,6 +8,7 @@ service ActionsService {
   rpc List (ListRequest) returns (ListResponse);
   rpc Add (AddRequest) returns (AddResponse);
   rpc Get (GetRequest) returns (GetResponse);
+  rpc Remove (RemoveRequest) returns (RemoveResponse);
 }
 
 message ListRequest {
@@ -38,6 +39,14 @@ message GetRequest {
 message GetResponse {
   bool success = 1;
   string result_full_path = 2;
+}
+
+message RemoveRequest {
+  string id = 1;
+}
+
+message RemoveResponse {
+  bool success = 1;
 }
 
 message FileRecord {
