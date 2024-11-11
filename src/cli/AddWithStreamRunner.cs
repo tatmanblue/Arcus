@@ -1,16 +1,16 @@
 ﻿using Microsoft.Extensions.Logging;
-using Arcus.GRPC;
 
 namespace ArcusCli;
 
 /// <summary>
-/// AddRunner gives file information to the service for it to store
+/// Sends a file to the service
 /// </summary>
-public class AddRunner(ILogger<AddRunner> logger, string[] args) 
-    : AbstractBaseRunner<AddRunner>(logger, args)
+/// <param name="logger"></param>
+/// <param name="args"></param>
+public class AddWithStreamRunner(ILogger<AddWithStreamRunner> logger, string[] args)
+    : AbstractBaseRunner<AddWithStreamRunner>(logger, args)
 {
     public override CliCommand Command { get; } = CliCommand.Add;
-
     public override void Run()
     {
         logger.LogDebug("Running add");
@@ -31,15 +31,9 @@ public class AddRunner(ILogger<AddRunner> logger, string[] args)
         
         string fullFilePath = Path.GetFullPath(fileName);
         string shortName = Path.GetFileName(fullFilePath);
-        
-        var request = new AddRequest()
-        {
-            ShortName = shortName,
-            OriginFullPath = fullFilePath,
-        };
-        
-        var response = client.Add(request);
-        
-        logger.LogInformation($"File {shortName} is added. Id = {response.Id}");
+        var ftc = new FileTransferClient(client);
+
+        var response = ftc.UploadFileAsync(shortName, fullFilePath).Result;
+        logger.LogInformation($"File {shortName} is uploaded. Id: {response.Id}");
     }
 }

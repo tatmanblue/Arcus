@@ -9,28 +9,32 @@ namespace ArcusWinSvc;
 /// </summary>
 public class LocalDataStore
 {
-    public void AddRequest(IndexFileRecord record)
+    public LocalDataStoreStream AddRequest(IndexFileRecord record)
     {
         var dir = $"{GetStoreLocation()}\\{record.Id}";
+        // hard assumption it doesn't already exist, and it is a problem if it is
+        // but for this POC, not important enough
         Directory.CreateDirectory(dir);
-        
-        File.Copy(record.OriginFullPath, $"{dir}\\{record.Id}.file");
+
+        return GetFileStream(record);
     }
 
-    public string GetRequest(IndexFileRecord record, string destination)
+    public LocalDataStoreStream GetFileStream(IndexFileRecord record)
+    {
+        var dir = $"{GetStoreLocation()}\\{record.Id}";
+        var file = $"{dir}\\{record.Id}.file";
+
+        LocalDataStoreStream ldss = new LocalDataStoreStream(file);
+        return ldss;
+    }
+
+    public LocalDataStoreStream GetRequest(IndexFileRecord record)
     {
         var dir = $"{GetStoreLocation()}\\{record.Id}";
         if (false == Directory.Exists(dir))
             throw new DirectoryNotFoundException();
         
-        if (false == Directory.Exists(destination))
-            throw new DirectoryNotFoundException();
-        
-        string fullPath = $"{destination}\\{record.ShortName}";
-        
-        File.Copy($"{dir}\\{record.Id}.file", fullPath);
-        
-        return fullPath;
+        return GetFileStream(record);
     }
     
     private string GetStoreLocation()

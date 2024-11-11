@@ -43,50 +43,6 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
         
         return Task.FromResult(response);
     }
-    
-    public override Task<AddResponse> Add(AddRequest request, ServerCallContext context)
-    {
-        // TODO need to validation, shadow data etc
-        // TODO need to actually copy the file to storage
-
-        IndexFileRecord addRecord = new IndexFileRecord()
-        {
-            ShortName = request.ShortName,
-            OriginFullPath = request.OriginFullPath,
-            Status = FileStatuses.PENDING
-        };
-        
-        localDataStore.AddRequest(addRecord);
-        
-        addRecord.Status = FileStatuses.VALID;
-        indexManager.AddRecord(addRecord);
-        
-        var response = new AddResponse()
-        {
-            Status = (Arcus.GRPC.FileStatuses) addRecord.Status,
-            Id = addRecord.Id
-        };
-        
-        return Task.FromResult(response);
-    }
-
-    public override Task<GetResponse> Get(GetRequest request, ServerCallContext context)
-    {
-        var response = new GetResponse()
-        {
-            Success = false
-        };
-        
-        IndexFileRecord record = indexManager.GetRecord(request.Id);
-
-        if (null != record)
-        {
-            response.ResultFullPath = localDataStore.GetRequest(record, request.DestinationPath);
-            response.Success = true;
-        }
-
-        return Task.FromResult(response);
-    }
 
     public override Task<RemoveResponse> Remove(RemoveRequest request, ServerCallContext context)
     {
@@ -104,5 +60,77 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
         }
         
         return Task.FromResult(response);
+    }
+    
+    public override async Task<AddResponse> Add(
+        IAsyncStreamReader<AddRequest> request,
+        ServerCallContext context)
+    {
+        IndexFileRecord addRecord = null;
+        LocalDataStoreStream ldss = null;
+        
+        try
+        {
+            // Read the incoming file stream from the client
+            while (await request.MoveNext())
+            {
+                var currentRequest = request.Current;
+
+                // this is a bit crappy that we do not get index data until
+                // the first chunk of the file is also received.  We cannot initialize
+                // the record, nor the stream until that first chunk is received
+                if (null == addRecord)
+                {
+                    addRecord = new IndexFileRecord()
+                    {
+                        ShortName = request.Current.ShortName,
+                        OriginFullPath = request.Current.OriginFullPath,
+                        Keywords = request.Current.Keywords.ToList(),
+                        Status = FileStatuses.PENDING
+                    };
+
+                    ldss = localDataStore.AddRequest(addRecord);
+                }
+
+                // Write the current chunk to the file
+                await ldss.WriteBytes(currentRequest.ChunkData.ToByteArray());
+            }
+            
+            addRecord.Status = FileStatuses.VALID;
+            indexManager.AddRecord(addRecord);
+
+            return new AddResponse()
+            {
+                Id = addRecord.Id,
+                Status = (Arcus.GRPC.FileStatuses) addRecord.Status,
+            };
+        }
+        finally
+        {
+            ldss?.Close();
+        }
+    }
+    
+    public override async Task Get(
+        GetRequest request,
+        IServerStreamWriter<GetResponse> responseStream,
+        ServerCallContext context)
+    {
+        IndexFileRecord record = indexManager.GetRecord(request.Id);
+        
+        using LocalDataStoreStream ldss = localDataStore.GetRequest(record);
+
+        var buffer = new byte[8192];                // 8KB buffer size, TODO get from config
+        int bytesRead;
+
+        while ((bytesRead = await ldss.ReadBytes(buffer, buffer.Length)) > 0)
+        {
+            var response = new GetResponse()
+            {
+                ChunkData = Google.Protobuf.ByteString.CopyFrom(buffer, 0, bytesRead)
+            };
+
+            await responseStream.WriteAsync(response);
+        }
     }
 }

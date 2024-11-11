@@ -30,7 +30,7 @@ public class HelpRunner : IArgumentRunner
         StringBuilder builder = new();
         builder.AppendLine("Usage:");
         builder.AppendLine("  add --file={filename}");
-        builder.AppendLine("  get --id={id} --path={path}");
+        builder.AppendLine("  get --id={id} --file={filename}");
         builder.AppendLine("  list");
         builder.AppendLine("  remove --id={id}");
         builder.AppendLine("  update --id={id}");
