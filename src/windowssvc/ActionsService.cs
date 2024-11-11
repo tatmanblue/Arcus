@@ -68,9 +68,6 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
     {
         IndexFileRecord addRecord = null;
         LocalDataStoreStream ldss = null;
-
-        // TODO this replaces localDataStore.AddRequest(addRecord);
-        // TODO refactor to follow pattern
         
         try
         {
@@ -92,7 +89,7 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
                         Status = FileStatuses.PENDING
                     };
 
-                    ldss = localDataStore.GetFileStream(addRecord);
+                    ldss = localDataStore.AddRequest(addRecord);
                 }
 
                 // Write the current chunk to the file
@@ -121,9 +118,7 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
     {
         IndexFileRecord record = indexManager.GetRecord(request.Id);
         
-        // TODO how should this code below be refactored to mirror pattern as 
-        // TODO this replaces localDataStore.GetRequest(record, request.DestinationPath);
-        using LocalDataStoreStream ldss = localDataStore.GetFileStream(record);
+        using LocalDataStoreStream ldss = localDataStore.GetRequest(record);
 
         var buffer = new byte[8192];                // 8KB buffer size, TODO get from config
         int bytesRead;
