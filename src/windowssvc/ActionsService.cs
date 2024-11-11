@@ -112,6 +112,9 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
     {
         IndexFileRecord addRecord = null;
         LocalDataStoreStream ldss = null;
+
+        // TODO this replaces localDataStore.AddRequest(addRecord);
+        // TODO refactor to follow pattern
         
         try
         {
@@ -128,15 +131,13 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
                         OriginFullPath = "NA",
                         Status = FileStatuses.PENDING
                     };
-                    
+
                     ldss = localDataStore.GetFileStream(addRecord);
                 }
-                
+
                 // Write the current chunk to the file
                 await ldss.AddBytes(currentRequest.ChunkData.ToByteArray());
             }
-            
-            ldss.Close();
             
             addRecord.Status = FileStatuses.VALID;
             indexManager.AddRecord(addRecord);
@@ -147,13 +148,9 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
                 Message = "File uploaded successfully."
             };
         }
-        catch (Exception ex)
+        finally
         {
-            return new UploadFileResponse
-            {
-                Success = false,
-                Message = $"File upload failed: {ex.Message}"
-            };
+            ldss?.Close();
         }
     }
     
@@ -162,6 +159,23 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
         IServerStreamWriter<DownloadFileResponse> responseStream,
         ServerCallContext context)
     {
-        throw new NotImplementedException();
+        IndexFileRecord record = indexManager.GetRecord(request.Id);
+        
+        // TODO how should this code below be refactored to mirror pattern as 
+        // TODO this replaces localDataStore.GetRequest(record, request.DestinationPath);
+        using LocalDataStoreStream ldss = localDataStore.GetFileStream(record);
+
+        var buffer = new byte[8192];                // 8KB buffer size, TODO get from config
+        int bytesRead;
+
+        while ((bytesRead = await ldss.ReadBytes(buffer, buffer.Length)) > 0)
+        {
+            var response = new DownloadFileResponse
+            {
+                ChunkData = Google.Protobuf.ByteString.CopyFrom(buffer, 0, bytesRead)
+            };
+
+            await responseStream.WriteAsync(response);
+        }
     }
 }

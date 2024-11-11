@@ -59,7 +59,6 @@ message RemoveResponse {
 
 message UploadFileRequest {
   string short_name = 1;
-  string id = 2;
   bytes chunk_data = 3;
 }
 
@@ -69,7 +68,7 @@ message UploadFileResponse {
 }
 
 message DownloadFileRequest {
-  string file_name = 1;
+  string id = 1;
 }
 
 message DownloadFileResponse {

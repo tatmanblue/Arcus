@@ -50,7 +50,8 @@ public class CliConfiguration
                 runner = new AddWithStreamRunner(serviceProvider.GetService<ILogger<AddWithStreamRunner>>(), cmdArgs);
                 break;
             case "get":
-                runner = new GetRunner(serviceProvider.GetService<ILogger<GetRunner>>(), cmdArgs);
+                // runner = new GetRunner(serviceProvider.GetService<ILogger<GetRunner>>(), cmdArgs);
+                runner = new GetWithStreamRunner(serviceProvider.GetService<ILogger<GetWithStreamRunner>>(), cmdArgs);
                 break;
             case "remove":
                 runner = new RemoveRunner(serviceProvider.GetService<ILogger<RemoveRunner>>(), cmdArgs);
