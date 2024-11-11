@@ -79,12 +79,16 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
             {
                 var currentRequest = request.Current;
 
+                // this is a bit crappy that we do not get index data until
+                // the first chunk of the file is also received.  We cannot initialize
+                // the record, nor the stream until that first chunk is received
                 if (null == addRecord)
                 {
                     addRecord = new IndexFileRecord()
                     {
                         ShortName = request.Current.ShortName,
-                        OriginFullPath = "NA",
+                        OriginFullPath = request.Current.OriginFullPath,
+                        Keywords = request.Current.Keywords.ToList(),
                         Status = FileStatuses.PENDING
                     };
 
