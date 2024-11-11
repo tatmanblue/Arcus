@@ -4,13 +4,21 @@ option csharp_namespace = "Arcus.GRPC"; // Adjust namespace as necessary
 
 import "google/protobuf/timestamp.proto";  // To use a timestamp for the date
 
+// --------------------------------------------------------
+// Actual Service Definition
 service ActionsService {
   rpc List (ListRequest) returns (ListResponse);
   rpc Add (AddRequest) returns (AddResponse);
   rpc Get (GetRequest) returns (GetResponse);
   rpc Remove (RemoveRequest) returns (RemoveResponse);
+
+  // Temporary until it works then decide if it should be combined into Add/Get
+  rpc UploadFile (stream UploadFileRequest) returns (UploadFileResponse);
+  rpc DownloadFile (DownloadFileRequest) returns (stream DownloadFileResponse);
 }
 
+// --------------------------------------------------------
+// Request/Reponse message definitions
 message ListRequest {
   string filters_json = 1;
 }
@@ -49,6 +57,27 @@ message RemoveResponse {
   bool success = 1;
 }
 
+message UploadFileRequest {
+  string short_name = 1;
+  string id = 2;
+  bytes chunk_data = 3;
+}
+
+message UploadFileResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message DownloadFileRequest {
+  string file_name = 1;
+}
+
+message DownloadFileResponse {
+  bytes chunk_data = 1;
+}
+
+// --------------------------------------------------------
+// Additional type definitions
 message FileRecord {
   string id = 1;
   string file_name = 2;                      // The file name

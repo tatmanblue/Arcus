@@ -105,4 +105,63 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
         
         return Task.FromResult(response);
     }
+    
+    public override async Task<UploadFileResponse> UploadFile(
+        IAsyncStreamReader<UploadFileRequest> request,
+        ServerCallContext context)
+    {
+        IndexFileRecord addRecord = null;
+        LocalDataStoreStream ldss = null;
+        
+        try
+        {
+            // Read the incoming file stream from the client
+            while (await request.MoveNext())
+            {
+                var currentRequest = request.Current;
+
+                if (null == addRecord)
+                {
+                    addRecord = new IndexFileRecord()
+                    {
+                        ShortName = request.Current.ShortName,
+                        OriginFullPath = "NA",
+                        Status = FileStatuses.PENDING
+                    };
+                    
+                    ldss = localDataStore.GetFileStream(addRecord);
+                }
+                
+                // Write the current chunk to the file
+                await ldss.AddBytes(currentRequest.ChunkData.ToByteArray());
+            }
+            
+            ldss.Close();
+            
+            addRecord.Status = FileStatuses.VALID;
+            indexManager.AddRecord(addRecord);
+
+            return new UploadFileResponse
+            {
+                Success = true,
+                Message = "File uploaded successfully."
+            };
+        }
+        catch (Exception ex)
+        {
+            return new UploadFileResponse
+            {
+                Success = false,
+                Message = $"File upload failed: {ex.Message}"
+            };
+        }
+    }
+    
+    public override async Task DownloadFile(
+        DownloadFileRequest request,
+        IServerStreamWriter<DownloadFileResponse> responseStream,
+        ServerCallContext context)
+    {
+        throw new NotImplementedException();
+    }
 }

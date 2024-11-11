@@ -17,6 +17,16 @@ public class LocalDataStore
         File.Copy(record.OriginFullPath, $"{dir}\\{record.Id}.file");
     }
 
+    public LocalDataStoreStream GetFileStream(IndexFileRecord record)
+    {
+        var dir = $"{GetStoreLocation()}\\{record.Id}";
+        Directory.CreateDirectory(dir);
+        var file = $"{dir}\\{record.Id}.file";
+
+        LocalDataStoreStream ldss = new LocalDataStoreStream(file);
+        return ldss;
+    }
+
     public string GetRequest(IndexFileRecord record, string destination)
     {
         var dir = $"{GetStoreLocation()}\\{record.Id}";

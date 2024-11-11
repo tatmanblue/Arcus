@@ -46,7 +46,8 @@ public class CliConfiguration
                 runner = new ListRunner(serviceProvider.GetService<ILogger<ListRunner>>());
                 break;
             case "add":
-                runner = new AddRunner(serviceProvider.GetService<ILogger<AddRunner>>(), cmdArgs);
+                // runner = new AddRunner(serviceProvider.GetService<ILogger<AddRunner>>(), cmdArgs);
+                runner = new AddWithStreamRunner(serviceProvider.GetService<ILogger<AddWithStreamRunner>>(), cmdArgs);
                 break;
             case "get":
                 runner = new GetRunner(serviceProvider.GetService<ILogger<GetRunner>>(), cmdArgs);
