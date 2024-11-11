@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 namespace ArcusCli;
 
 /// <summary>
-/// This will Replace GetRunner
+/// Gets a files from the service, copying the bytes received to the file specified
 /// </summary>
 /// <param name="logger"></param>
 /// <param name="args"></param>
@@ -22,7 +22,7 @@ public class GetWithStreamRunner(ILogger<GetWithStreamRunner> logger, string[] a
         var parser = new ArgumentParser(args);
         
         string id = parser.GetArgument<string>("id");
-        string path = parser.GetArgument<string>("path");
+        string path = parser.GetArgument<string>("file");
         
         if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(path))
             throw new CliArgumentException();
@@ -34,7 +34,8 @@ public class GetWithStreamRunner(ILogger<GetWithStreamRunner> logger, string[] a
         
         var ftc = new FileTransferClient(client);
 
-        ftc.DownloadFileAsync(id, fullFilePath).Wait();
+        long bytes = ftc.DownloadFileAsync(id, fullFilePath).Result;
 
+        logger.LogInformation($"file {id} has been downloaded to {fullFilePath}.  Bytes: {bytes}");
     }
 }

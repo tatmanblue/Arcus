@@ -3,13 +3,13 @@
 namespace ArcusWinSvc;
 
 /// <summary>
-/// 
+/// Reads and writes content to/from files stored locally to the service
 /// </summary>
 public class LocalDataStoreStream(string file) : IDisposable
 {
     private FileStream fileStream = null;
 
-    public async Task AddBytes(byte[] chunk)
+    public async Task WriteBytes(byte[] chunk)
     {
         if (null == fileStream)
             fileStream = new FileStream(file, FileMode.Create, FileAccess.Write);

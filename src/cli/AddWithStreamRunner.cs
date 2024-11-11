@@ -3,7 +3,7 @@
 namespace ArcusCli;
 
 /// <summary>
-/// This will replace the existing add
+/// Sends a file to the service
 /// </summary>
 /// <param name="logger"></param>
 /// <param name="args"></param>
@@ -33,7 +33,7 @@ public class AddWithStreamRunner(ILogger<AddWithStreamRunner> logger, string[] a
         string shortName = Path.GetFileName(fullFilePath);
         var ftc = new FileTransferClient(client);
 
-        ftc.UploadFileAsync(shortName, fullFilePath).Wait();
-     
+        var response = ftc.UploadFileAsync(shortName, fullFilePath).Result;
+        logger.LogInformation($"File {shortName} is uploaded. Id: {response.Id}");
     }
 }

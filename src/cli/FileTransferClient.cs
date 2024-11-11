@@ -11,86 +11,64 @@ namespace ArcusCli;
 /// </summary>
 public class FileTransferClient(ActionsService.ActionsServiceClient client)
 {
-    public async Task UploadFileAsync(string shortName, string filePath)
+    /// <summary>
+    /// Responsible for sending the file to the service, using GRPC streams
+    /// </summary>
+    /// <param name="shortName"></param>
+    /// <param name="filePath"></param>
+    public async Task<AddResponse> UploadFileAsync(string shortName, string filePath)
     {
-        // Create the gRPC call for streaming the file
-        using var call = client.UploadFile();
+        using var call = client.Add();
 
         var buffer = new byte[8192]; // 8KB chunk size, TODO get from config
         int bytesRead = 0;
 
-        try
-        {
-            // Open the file stream for reading
-            using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+        using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
 
-            while ((bytesRead = await fileStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+        while ((bytesRead = await fileStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+        {
+            var request = new AddRequest()
             {
-                // Create the upload request with the chunk data
-                var request = new UploadFileRequest
-                {
-                    ShortName = shortName,
-                    ChunkData = Google.Protobuf.ByteString.CopyFrom(buffer, 0, bytesRead)
-                };
+                ShortName = shortName,
+                ChunkData = Google.Protobuf.ByteString.CopyFrom(buffer, 0, bytesRead)
+            };
 
-                // Send the chunk to the server
-                await call.RequestStream.WriteAsync(request);
-            }
-
-            // Mark the stream as complete
-            await call.RequestStream.CompleteAsync();
-
-            // Get the response from the server
-            var response = await call.ResponseAsync;
-
-            Console.WriteLine($"File upload success: {response.Success}, Message: {response.Message}");
+            await call.RequestStream.WriteAsync(request);
         }
-        catch (RpcException rpcEx)
-        {
-            Console.WriteLine($"gRPC error: {rpcEx.Status.Detail}");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error uploading file: {ex.Message}");
-        }
+
+        await call.RequestStream.CompleteAsync();
+        var response = await call.ResponseAsync;
+
+        return response;
     }
 
-    public async Task DownloadFileAsync(string id, string destinationPath)
+    public async Task<long> DownloadFileAsync(string id, string destination)
     {
-        var request = new DownloadFileRequest { Id = id };
+        var request = new GetRequest() { Id = id };
 
-        try
+        // Create the gRPC call for streaming the file download
+        using var call = client.Get(request);
+
+        // Create or overwrite the local file to save the downloaded content
+        using var fileStream = new FileStream(destination, FileMode.Create, FileAccess.Write);
+
+        // Buffer size for writing chunks
+        byte[] buffer;
+        long bytesRead = 0;
+
+        // Read the stream from the server in chunks
+        while (await call.ResponseStream.MoveNext())
         {
-            // Create the gRPC call for streaming the file download
-            using var call = client.DownloadFile(request);
+            var currentChunk = call.ResponseStream.Current;
 
-            // Create or overwrite the local file to save the downloaded content
-            using var fileStream = new FileStream(destinationPath, FileMode.Create, FileAccess.Write);
+            // Convert the chunk data (ByteString) into a byte array
+            buffer = currentChunk.ChunkData.ToByteArray();
 
-            // Buffer size for writing chunks
-            byte[] buffer;
-
-            // Read the stream from the server in chunks
-            while (await call.ResponseStream.MoveNext())
-            {
-                var currentChunk = call.ResponseStream.Current;
-
-                // Convert the chunk data (ByteString) into a byte array
-                buffer = currentChunk.ChunkData.ToByteArray();
-
-                // Write the chunk to the file
-                await fileStream.WriteAsync(buffer, 0, buffer.Length);
-            }
-
-            Console.WriteLine($"File '{id}' downloaded successfully to '{destinationPath}'.");
+            // Write the chunk to the file
+            await fileStream.WriteAsync(buffer, 0, buffer.Length);
+            bytesRead += buffer.Length;
         }
-        catch (RpcException rpcEx)
-        {
-            Console.WriteLine($"gRPC error: {rpcEx.Status.Detail}");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error downloading file: {ex.Message}");
-        }
+        
+        return bytesRead;
     }
 }

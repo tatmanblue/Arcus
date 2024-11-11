@@ -43,50 +43,6 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
         
         return Task.FromResult(response);
     }
-    
-    public override Task<AddResponse> Add(AddRequest request, ServerCallContext context)
-    {
-        // TODO need to validation, shadow data etc
-        // TODO need to actually copy the file to storage
-
-        IndexFileRecord addRecord = new IndexFileRecord()
-        {
-            ShortName = request.ShortName,
-            OriginFullPath = request.OriginFullPath,
-            Status = FileStatuses.PENDING
-        };
-        
-        localDataStore.AddRequest(addRecord);
-        
-        addRecord.Status = FileStatuses.VALID;
-        indexManager.AddRecord(addRecord);
-        
-        var response = new AddResponse()
-        {
-            Status = (Arcus.GRPC.FileStatuses) addRecord.Status,
-            Id = addRecord.Id
-        };
-        
-        return Task.FromResult(response);
-    }
-
-    public override Task<GetResponse> Get(GetRequest request, ServerCallContext context)
-    {
-        var response = new GetResponse()
-        {
-            Success = false
-        };
-        
-        IndexFileRecord record = indexManager.GetRecord(request.Id);
-
-        if (null != record)
-        {
-            response.ResultFullPath = localDataStore.GetRequest(record, request.DestinationPath);
-            response.Success = true;
-        }
-
-        return Task.FromResult(response);
-    }
 
     public override Task<RemoveResponse> Remove(RemoveRequest request, ServerCallContext context)
     {
@@ -106,8 +62,8 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
         return Task.FromResult(response);
     }
     
-    public override async Task<UploadFileResponse> UploadFile(
-        IAsyncStreamReader<UploadFileRequest> request,
+    public override async Task<AddResponse> Add(
+        IAsyncStreamReader<AddRequest> request,
         ServerCallContext context)
     {
         IndexFileRecord addRecord = null;
@@ -136,16 +92,16 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
                 }
 
                 // Write the current chunk to the file
-                await ldss.AddBytes(currentRequest.ChunkData.ToByteArray());
+                await ldss.WriteBytes(currentRequest.ChunkData.ToByteArray());
             }
             
             addRecord.Status = FileStatuses.VALID;
             indexManager.AddRecord(addRecord);
 
-            return new UploadFileResponse
+            return new AddResponse()
             {
-                Success = true,
-                Message = "File uploaded successfully."
+                Id = addRecord.Id,
+                Status = (Arcus.GRPC.FileStatuses) addRecord.Status,
             };
         }
         finally
@@ -154,9 +110,9 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
         }
     }
     
-    public override async Task DownloadFile(
-        DownloadFileRequest request,
-        IServerStreamWriter<DownloadFileResponse> responseStream,
+    public override async Task Get(
+        GetRequest request,
+        IServerStreamWriter<GetResponse> responseStream,
         ServerCallContext context)
     {
         IndexFileRecord record = indexManager.GetRecord(request.Id);
@@ -170,7 +126,7 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
 
         while ((bytesRead = await ldss.ReadBytes(buffer, buffer.Length)) > 0)
         {
-            var response = new DownloadFileResponse
+            var response = new GetResponse()
             {
                 ChunkData = Google.Protobuf.ByteString.CopyFrom(buffer, 0, bytesRead)
             };

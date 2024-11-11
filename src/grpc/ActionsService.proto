@@ -8,13 +8,11 @@ import "google/protobuf/timestamp.proto";  // To use a timestamp for the date
 // Actual Service Definition
 service ActionsService {
   rpc List (ListRequest) returns (ListResponse);
-  rpc Add (AddRequest) returns (AddResponse);
-  rpc Get (GetRequest) returns (GetResponse);
+  // rpc Add (AddRequest) returns (AddResponse);
+  // rpc Get (GetRequest) returns (GetResponse);
+  rpc Add (stream AddRequest) returns (AddResponse);
+  rpc Get (GetRequest) returns (stream GetResponse);
   rpc Remove (RemoveRequest) returns (RemoveResponse);
-
-  // Temporary until it works then decide if it should be combined into Add/Get
-  rpc UploadFile (stream UploadFileRequest) returns (UploadFileResponse);
-  rpc DownloadFile (DownloadFileRequest) returns (stream DownloadFileResponse);
 }
 
 // --------------------------------------------------------
@@ -32,6 +30,7 @@ message AddRequest {
   string short_name = 1;
   string origin_full_path = 2;
   repeated string keywords = 3;
+  bytes chunk_data = 4;
 }
 
 message AddResponse {
@@ -41,12 +40,10 @@ message AddResponse {
 
 message GetRequest {
   string id = 1;
-  string destination_path = 2;
 }
 
 message GetResponse {
-  bool success = 1;
-  string result_full_path = 2;
+  bytes chunk_data = 1;
 }
 
 message RemoveRequest {
@@ -55,20 +52,6 @@ message RemoveRequest {
 
 message RemoveResponse {
   bool success = 1;
-}
-
-message UploadFileRequest {
-  string short_name = 1;
-  bytes chunk_data = 3;
-}
-
-message UploadFileResponse {
-  bool success = 1;
-  string message = 2;
-}
-
-message DownloadFileRequest {
-  string id = 1;
 }
 
 message DownloadFileResponse {
