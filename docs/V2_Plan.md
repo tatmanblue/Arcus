@@ -4,10 +4,10 @@
 1. Stream file between CLI and service instead of service copying file directly ___Done___
 2. Support for cloud.  S3 storage, that kind of thing  
 3. Service adds checks for integrity  
-4. Service encodes or encrypts files  
-5. 5. Error handling on both the service and cli  
-4. Review PRs and add technical updates like error handling  
-5. Add configuration  
+4. Service encodes or encrypts files
+5. Error handling on both the service and cli
+6. Review PRs and add technical updates like error handling
+7. Add configuration management 
 
 
 ## Support for the Cloud.
