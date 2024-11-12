@@ -12,7 +12,7 @@
 
 ## Support for the Cloud.
 
-Possibly integrate with [Aspire](https://learn.microsoft.com/en-us/dotnet/aspire/).  
+Possibly integrate with [Aspire](https://learn.microsoft.com/en-us/dotnet/aspire/).  Google Cloud vs AWS S2 [comparision](https://cloudmounter.net/amazon-s3-vs-google-cloud-storage/).  
 
 ## Checks and integrity  
 
