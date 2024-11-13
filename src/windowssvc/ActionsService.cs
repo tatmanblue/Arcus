@@ -11,15 +11,15 @@ namespace ArcusWinSvc;
 public class ActionsServiceImpl : ActionsService.ActionsServiceBase
 {
     private ILogger<ActionsServiceImpl> logger;
-    private IndexFileManager indexManager;
-    private LocalDataStore localDataStore;
+    private IIndexFileManager indexManager;
+    private IFileAccess fileAccess;
 
     public ActionsServiceImpl(ILogger<ActionsServiceImpl> logger, 
-        IndexFileManager indexManager, LocalDataStore localDataStore)
+        IIndexFileManager indexManager, IFileAccess fileAccess)
     {
         this.logger = logger;
         this.indexManager = indexManager;
-        this.localDataStore = localDataStore;
+        this.fileAccess = fileAccess;
     }
     
     public override Task<ListResponse> List(ListRequest request, ServerCallContext context)
@@ -53,7 +53,7 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
         
         IndexFileRecord record = indexManager.GetRecord(request.Id);
 
-        if (null != record && localDataStore.RemoveRequest(record))
+        if (null != record && fileAccess.RemoveRequest(record))
         {
             indexManager.RemoveRecord(record);
             response.Success = true;
@@ -67,7 +67,7 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
         ServerCallContext context)
     {
         IndexFileRecord addRecord = null;
-        LocalDataStoreStream ldss = null;
+        IFileAccessStream fas = null;
         
         try
         {
@@ -89,11 +89,11 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
                         Status = FileStatuses.PENDING
                     };
 
-                    ldss = localDataStore.AddRequest(addRecord);
+                    fas = fileAccess.AddRequest(addRecord);
                 }
 
                 // Write the current chunk to the file
-                await ldss.WriteBytes(currentRequest.ChunkData.ToByteArray());
+                await fas.WriteBytes(currentRequest.ChunkData.ToByteArray());
             }
             
             addRecord.Status = FileStatuses.VALID;
@@ -107,7 +107,7 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
         }
         finally
         {
-            ldss?.Close();
+            fas?.Close();
         }
     }
     
@@ -118,12 +118,12 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
     {
         IndexFileRecord record = indexManager.GetRecord(request.Id);
         
-        using LocalDataStoreStream ldss = localDataStore.GetRequest(record);
+        using IFileAccessStream fas = fileAccess.GetRequest(record);
 
         var buffer = new byte[8192];                // 8KB buffer size, TODO get from config
         int bytesRead;
 
-        while ((bytesRead = await ldss.ReadBytes(buffer, buffer.Length)) > 0)
+        while ((bytesRead = await fas.ReadBytes(buffer, buffer.Length)) > 0)
         {
             var response = new GetResponse()
             {

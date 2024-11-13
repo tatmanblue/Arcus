@@ -5,7 +5,7 @@ namespace ArcusWinSvc;
 /// <summary>
 /// Reads and writes content to/from files stored locally to the service
 /// </summary>
-public class LocalDataStoreStream(string file) : IDisposable
+public class LocalDataAccessStream(string file) : IFileAccessStream, IDisposable
 {
     private FileStream fileStream = null;
 
