@@ -7,9 +7,9 @@ namespace ArcusWinSvc;
 ///
 /// If I continue this project, use interface and blah blah blah
 /// </summary>
-public class LocalDataStore
+public class LocalDataAccess : IFileAccess
 {
-    public LocalDataStoreStream AddRequest(IndexFileRecord record)
+    public IFileAccessStream AddRequest(IndexFileRecord record)
     {
         var dir = $"{GetStoreLocation()}\\{record.Id}";
         // hard assumption it doesn't already exist, and it is a problem if it is
@@ -19,16 +19,16 @@ public class LocalDataStore
         return GetFileStream(record);
     }
 
-    public LocalDataStoreStream GetFileStream(IndexFileRecord record)
+    public IFileAccessStream GetFileStream(IndexFileRecord record)
     {
         var dir = $"{GetStoreLocation()}\\{record.Id}";
         var file = $"{dir}\\{record.Id}.file";
 
-        LocalDataStoreStream ldss = new LocalDataStoreStream(file);
+        LocalDataAccessStream ldss = new LocalDataAccessStream(file);
         return ldss;
     }
 
-    public LocalDataStoreStream GetRequest(IndexFileRecord record)
+    public IFileAccessStream GetRequest(IndexFileRecord record)
     {
         var dir = $"{GetStoreLocation()}\\{record.Id}";
         if (false == Directory.Exists(dir))

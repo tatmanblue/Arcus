@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddSingleton<LocalDataStore>();
-builder.Services.AddSingleton<IndexFileManager>();
+builder.Services.AddSingleton<IFileAccess, LocalDataAccess>();
+builder.Services.AddSingleton<IIndexFileManager, IndexFileManager>();
 
 builder.Services.AddWindowsService();
 builder.Services.AddHostedService<Worker>();

@@ -10,7 +10,7 @@ namespace ArcusWinSvc;
 /// TODO may want to create an interface this or consume interfaces for reading/write,
 /// TODO especially if I move this to the cloud and will not be using harddrive FS  
 /// </summary>
-public class IndexFileManager
+public class IndexFileManager : IIndexFileManager
 {
     private ConcurrentBag<IndexFileRecord> records = new ();
     private ILogger<IndexFileManager> logger;
