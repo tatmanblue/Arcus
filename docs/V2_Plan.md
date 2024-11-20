@@ -8,6 +8,7 @@
 5. Error handling on both the service and cli
 6. Review PRs and add technical updates like error handling
 7. Add configuration management 
+8. Dynamic injection for URL downloader and type conversion functions
 
 
 ## Support for the Cloud.
@@ -28,3 +29,7 @@ Little bit of a brain dump on how this might work:  The service itself could thr
 ## Configuration  
 
 Some configuration elements are obvious.  Some are specific to CLI or service and others could be shared.  The CLI could provide and update some configuration elements of the service, possibly, or vice versa.
+
+## Dynamic injection 
+
+On the service side, different urls may need different handlers and conversion options will also have different implementations.  Make this injectable or factory

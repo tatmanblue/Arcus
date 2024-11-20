@@ -30,7 +30,14 @@ public class ArgumentParser
 
         if (arguments.ContainsKey(name))
         {
-            ret = (T)Convert.ChangeType(arguments[name], typeof(T));
+            if (typeof(T).IsEnum)
+            {
+                ret = (T)Enum.Parse(typeof(T), arguments[name], true);
+            }
+            else
+            {
+                ret = (T)Convert.ChangeType(arguments[name], typeof(T));
+            }
         }
 
         return ret;

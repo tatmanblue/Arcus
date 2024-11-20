@@ -54,6 +54,9 @@ public class CliConfiguration
             case "remove":
                 runner = new RemoveRunner(serviceProvider.GetService<ILogger<RemoveRunner>>(), cmdArgs);
                 break;
+            case "url":
+                runner = new UrlRunner(serviceProvider.GetService<ILogger<UrlRunner>>(), cmdArgs);
+                break;
             case "update":
             case "erase":
             case "config":

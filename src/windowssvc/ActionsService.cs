@@ -133,4 +133,10 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
             await responseStream.WriteAsync(response);
         }
     }
+
+    public override async Task<UrlResponse> Url(UrlRequest request, ServerCallContext context)
+    {
+        logger.LogDebug($"Url Handler got: {request.Url}");
+        throw new NotImplementedException();
+    }
 }

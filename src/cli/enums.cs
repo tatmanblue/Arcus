@@ -17,3 +17,9 @@ public enum CliCommand
     Config,
     Help
 }
+
+public enum ConvertTypes
+{
+    None,
+    MP3
+}

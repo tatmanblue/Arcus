@@ -8,11 +8,10 @@ import "google/protobuf/timestamp.proto";  // To use a timestamp for the date
 // Actual Service Definition
 service ActionsService {
   rpc List (ListRequest) returns (ListResponse);
-  // rpc Add (AddRequest) returns (AddResponse);
-  // rpc Get (GetRequest) returns (GetResponse);
   rpc Add (stream AddRequest) returns (AddResponse);
   rpc Get (GetRequest) returns (stream GetResponse);
   rpc Remove (RemoveRequest) returns (RemoveResponse);
+  rpc Url (UrlRequest) returns (UrlResponse);  
 }
 
 // --------------------------------------------------------
@@ -54,6 +53,18 @@ message RemoveResponse {
   bool success = 1;
 }
 
+message UrlRequest {
+  string url = 1;
+  UrlTypes type = 2;
+  ConversionTypes conversion = 3;
+  repeated string keywords = 4;
+}
+
+message UrlResponse {
+  string id = 1;
+  FileStatuses status = 2;
+}
+
 message DownloadFileResponse {
   bytes chunk_data = 1;
 }
@@ -73,4 +84,14 @@ enum FileStatuses {
   PENDING = 1;
   VALID = 2;
   ERROR = 3;
+}
+
+enum UrlTypes {
+  Generic = 0;
+  YouTube = 1;
+}
+
+enum ConversionTypes {
+  None = 0;
+  MP3 = 1;
 }
