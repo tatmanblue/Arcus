@@ -33,3 +33,8 @@ Some configuration elements are obvious.  Some are specific to CLI or service an
 ## Dynamic injection 
 
 On the service side, different urls may need different handlers and conversion options will also have different implementations.  Make this injectable or factory
+
+
+# Underlying Technical
+[SharpGrabber](https://github.com/dotnettools/SharpGrabber)  
+[LibVideo](https://github.com/omansak/libvideo)  

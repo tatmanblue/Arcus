@@ -17,6 +17,9 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="8.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="SharpGrabber" Version="2.1.1" />
+    <PackageReference Include="SharpGrabber.Converter" Version="1.1.0" />
+    <PackageReference Include="SharpGrabber.YouTube" Version="1.5.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\grpc\grpc.csproj" />
