@@ -13,6 +13,7 @@ public enum CliCommand
     Remove,
     Update,
     List,
+    Url,
     Erase,
     Config,
     Help

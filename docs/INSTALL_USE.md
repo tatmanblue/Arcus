@@ -2,8 +2,7 @@
 
 ## Separate downloads
 
-If you want to the use thr URL command, you will need
-1. [ffmpeg](https://www.ffmpeg.org/download.html)  
+None at this time
 
 ## Creating the service
 1. download the code

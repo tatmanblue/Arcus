@@ -80,18 +80,20 @@ message FileRecord {
 }
 
 enum FileStatuses {
-  UNKNOWN = 0;    // Default value (required)
+  UNKNOWN = 0;    
   PENDING = 1;
   VALID = 2;
   ERROR = 3;
 }
 
 enum UrlTypes {
-  Generic = 0;
-  YouTube = 1;
+  URL_TYPE_UNSPECIFIED = 0;  
+  URL_TYPE_GENERIC = 1;
+  URL_TYPE_YOUTUBE = 2;
 }
 
 enum ConversionTypes {
-  None = 0;
-  MP3 = 1;
+  CONVERSION_TYPE_UNSPECIFIED = 0;  
+  CONVERSION_TYPE_NONE = 1;
+  CONVERSION_TYPE_MP3 = 2;
 }

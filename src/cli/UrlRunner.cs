@@ -14,7 +14,7 @@ namespace ArcusCli;
 public class UrlRunner(ILogger<UrlRunner> logger, string[] args) 
     : AbstractBaseRunner<UrlRunner>(logger, args)
 {
-    public override CliCommand Command { get; }
+    public override CliCommand Command { get; } = CliCommand.Url;
     public override void Run()
     {
         // arguments:
