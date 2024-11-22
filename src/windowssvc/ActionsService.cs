@@ -1,8 +1,9 @@
-﻿using Grpc.Core;          // For gRPC core components like Server, ServerPort
+﻿using System.Net;
+using Grpc.Core;          // For gRPC core components like Server, ServerPort
 using Google.Protobuf.WellKnownTypes;
 using Arcus.GRPC;
-using DotNetTools.SharpGrabber;
-using DotNetTools.SharpGrabber.Grabbed;
+using YoutubeExplode;
+using YoutubeExplode.Videos.Streams;
 
 
 namespace ArcusWinSvc;
@@ -140,11 +141,6 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
     {
         logger.LogDebug($"Url Handler got: {request.Url}");
 
-        var grabber = GrabberBuilder.New()
-            .UseDefaultServices()
-            .AddYouTube()
-            .Build();
-
         var response = new UrlResponse()
         {
             Status = Arcus.GRPC.FileStatuses.Error
@@ -152,52 +148,30 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
 
         try
         {
-            GrabResult result;
-            try
-            {
-                result = await grabber.GrabAsync(new Uri(request.Url));
-            }
-            catch
-            {
-                // see https://github.com/dotnettools/SharpGrabber/issues/97
-                logger.LogDebug($"Running second attempt for URL: {request.Url}");
-                result = await grabber.GrabAsync(new Uri(request.Url));
-            }
+            var youtube = new YoutubeClient();
+            var videoUrl = request.Url;
+            var video = await youtube.Videos.GetAsync(videoUrl);
 
-            var info = result.Resource<GrabbedInfo>();
-            logger.LogInformation($"URL got {info}");
-            var mediaFiles = result.Resources<GrabbedMedia>().ToArray();
-            var bestAudio = mediaFiles.GetHighestQualityAudio();
-            logger.LogInformation($"Best audio = {bestAudio}");
-            var file = await DownloadMedia(bestAudio, result);
-            logger.LogInformation($"File = {file}");
+            var title = video.Title;
+            var streamManifest = await youtube.Videos.Streams.GetManifestAsync(videoUrl);
+            var audioStreamInfo = streamManifest
+                .GetAudioStreams()
+                .Where(s => s.Container == Container.Mp4)
+                .GetWithHighestBitrate();
+            
+            if (File.Exists($"f:\\downloads\\{title}.mp3"))
+                File.Delete($"f:\\downloads\\{title}.mp3");
+            
+            await youtube.Videos.Streams.DownloadAsync(audioStreamInfo, $"f:\\downloads\\{title}.mp3");
+
+            response.Status = Arcus.GRPC.FileStatuses.Valid;
         }
         catch (Exception ex)
         {
-            logger.LogError($"Url Handler failed: {ex.Message}");
+            logger.LogDebug($"Url Handler failed: {ex.Message}");
         }
-        
-        
+
         return await Task.FromResult(response);
     }
     
-    /// <summary>
-    /// this is temporary
-    /// </summary>
-    /// <param name="media"></param>
-    /// <param name="grabResult"></param>
-    /// <returns></returns>
-    private async Task<string> DownloadMedia(GrabbedMedia media, IGrabResult grabResult)
-    {
-        logger.LogDebug("Downloading {0}...", media.Title ?? media.FormatTitle ?? media.Resolution);
-        using var response = await new HttpClient().GetAsync(media.ResourceUri);
-        response.EnsureSuccessStatusCode();
-        using var downloadStream = await response.Content.ReadAsStreamAsync();
-        using var resourceStream = await grabResult.WrapStreamAsync(downloadStream);
-        var path = "f:\\downloads\\song.mp3";
-
-        using var fileStream = new FileStream(path, FileMode.Create);
-        await resourceStream.CopyToAsync(fileStream);
-        return path;
-    }
 }

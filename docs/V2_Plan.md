@@ -10,6 +10,7 @@
 7. Add configuration management 
 8. Dynamic injection for URL downloader and type conversion functions
 9. Move service GRPC handlers into separate types
+10. Replace Default logger in CLI
 
 
 ## Support for the Cloud.
@@ -39,6 +40,9 @@ On the service side, different urls may need different handlers and conversion o
 
 The service GRPC implementation should consume the logic, translating the request/response types into data needed by the logic so that the logic is separate from the GRPC handling.  
 
+## Replace Default logger in CLI
+
+The Cli should write plain, clear text to console not structured logging data
 
 # Underlying Technical
 [SharpGrabber](https://github.com/dotnettools/SharpGrabber)  
