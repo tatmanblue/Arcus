@@ -35,7 +35,7 @@ public class UrlRunner(ILogger<UrlRunner> logger, string[] args)
         var urlRequest = new UrlRequest()
         {
             Url = url,
-            Conversion = (ConversionTypes) convertType,
+            Conversion = ConversionTypes.ConversionTypeUnspecified
         };
 
         var response = client.Url(urlRequest);

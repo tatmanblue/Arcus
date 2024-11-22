@@ -155,13 +155,16 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
             Status = Arcus.GRPC.FileStatuses.Error
         };
 
+        IFileAccessStream fas = null;
+
         try
         {
             (string file, string title) = await new YouTube(request.Url).ExtractAudio();
-            
+
             string invalidCharsPattern = $"[{Regex.Escape(new string(Path.GetInvalidFileNameChars()))}]";
-            title = Regex.Replace(title, invalidCharsPattern, " ");;
-            
+            title = Regex.Replace(title, invalidCharsPattern, " ");
+            ;
+
             var addRecord = new IndexFileRecord()
             {
                 ShortName = Path.GetFileName(file),
@@ -169,19 +172,23 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
                 Keywords = request.Keywords.ToList(),
                 Status = FileStatuses.PENDING
             };
-            
-            var fas = fileAccess.AddRequest(addRecord);
+
+            fas = fileAccess.AddRequest(addRecord);
             await fas.LocalCopy(file);
-            
+
             addRecord.Status = FileStatuses.VALID;
             indexManager.AddRecord(addRecord);
-            
+
             response.Id = addRecord.Id;
             response.Status = Arcus.GRPC.FileStatuses.Valid;
         }
         catch (Exception ex)
         {
             logger.LogError($"Url Handler failed: {ex.Message}");
+        }
+        finally
+        {
+            fas?.Close();
         }
 
         return await Task.FromResult(response);
