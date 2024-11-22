@@ -157,21 +157,21 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
 
         try
         {
-            (string tempFile, string title) = await new YouTube(request.Url).ExtractAudio();
+            (string file, string title) = await new YouTube(request.Url).ExtractAudio();
             
             string invalidCharsPattern = $"[{Regex.Escape(new string(Path.GetInvalidFileNameChars()))}]";
             title = Regex.Replace(title, invalidCharsPattern, " ");;
             
             var addRecord = new IndexFileRecord()
             {
-                ShortName = Path.GetFileName(tempFile),
+                ShortName = Path.GetFileName(file),
                 OriginFullPath = title,
                 Keywords = request.Keywords.ToList(),
                 Status = FileStatuses.PENDING
             };
             
             var fas = fileAccess.AddRequest(addRecord);
-            await fas.LocalCopy(tempFile);
+            await fas.LocalCopy(file);
             
             addRecord.Status = FileStatuses.VALID;
             indexManager.AddRecord(addRecord);

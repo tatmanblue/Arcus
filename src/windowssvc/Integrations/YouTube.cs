@@ -7,7 +7,7 @@ namespace ArcusWinSvc.Integrations;
 /// <summary>
 /// Wraps access to
 ///
-///
+/// uses: https://github.com/Tyrrrz/YoutubeExplode
 /// TODO, likely extract this into an interface
 /// </summary>
 public class YouTube(string videoUrl)
