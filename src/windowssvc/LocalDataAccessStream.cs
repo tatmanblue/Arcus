@@ -3,7 +3,8 @@
 namespace ArcusWinSvc;
 
 /// <summary>
-/// Reads and writes content to/from files stored locally to the service
+/// Reads and writes content to/from files sent via GRPC or created by the service to
+/// the local storage area
 /// </summary>
 public class LocalDataAccessStream(string file) : IFileAccessStream, IDisposable
 {
@@ -25,6 +26,26 @@ public class LocalDataAccessStream(string file) : IFileAccessStream, IDisposable
         int bytesRead = await fileStream.ReadAsync(chunk, 0, chunkSize);
         
         return bytesRead;
+    }
+
+    /// <summary>
+    /// This is destructive and will delete source
+    /// </summary>
+    /// <param name="source"></param>
+    public async Task LocalCopy(string source)
+    {
+        if (File.Exists(file))
+            File.Delete(file);
+        
+        await using (FileStream sourceStream = File.Open(source, FileMode.Open))
+        {
+            await using (FileStream destinationStream = File.Create(file))
+            {
+                await sourceStream.CopyToAsync(destinationStream);
+            }
+        }
+        
+        File.Delete(source);
     }
 
     public void Close()

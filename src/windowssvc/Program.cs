@@ -35,3 +35,5 @@ host.MapGrpcService<ActionsServiceImpl>();
 
 // Run the host
 host.Run();
+
+Console.Out.Flush();

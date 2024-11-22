@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging.Debug;
 var serviceProvider = new ServiceCollection()
     .AddLogging(loggingBuilder =>
     {
+        loggingBuilder.ClearProviders();
         loggingBuilder.AddConsole();
         loggingBuilder.AddDebug();
     })
@@ -20,9 +21,9 @@ int ret = 1;
 
 try
 {
-    
+
     logger.LogDebug($"RECEIVED arguments: {string.Join(" ", args)}");
-    
+
     CliConfiguration.GetConfiguration(args, serviceProvider).Runner.Run();
     logger.LogInformation("Good bye");
     ret = 0;
@@ -39,6 +40,10 @@ catch (CliArgumentException)
 catch (Exception ex)
 {
     logger.LogError(ex, $"Arcus CLI failed. {ex.GetType().Name}"); 
+}
+finally
+{
+    Console.Out.Flush();
 }
 
 return ret;

@@ -1,7 +1,9 @@
 ﻿using System.Net;
+using System.Text.RegularExpressions;
 using Grpc.Core;          // For gRPC core components like Server, ServerPort
 using Google.Protobuf.WellKnownTypes;
 using Arcus.GRPC;
+using ArcusWinSvc.Integrations;
 using YoutubeExplode;
 using YoutubeExplode.Videos.Streams;
 
@@ -137,6 +139,13 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
         }
     }
 
+    /// <summary>
+    /// Currently the URL command only works on youtube videos.  There is no validation
+    /// the URL is valid etc....
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="context"></param>
+    /// <returns></returns>
     public override async Task<UrlResponse> Url(UrlRequest request, ServerCallContext context)
     {
         logger.LogDebug($"Url Handler got: {request.Url}");
@@ -148,27 +157,31 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
 
         try
         {
-            var youtube = new YoutubeClient();
-            var videoUrl = request.Url;
-            var video = await youtube.Videos.GetAsync(videoUrl);
-
-            var title = video.Title;
-            var streamManifest = await youtube.Videos.Streams.GetManifestAsync(videoUrl);
-            var audioStreamInfo = streamManifest
-                .GetAudioStreams()
-                .Where(s => s.Container == Container.Mp4)
-                .GetWithHighestBitrate();
+            (string tempFile, string title) = await new YouTube(request.Url).ExtractAudio();
             
-            if (File.Exists($"f:\\downloads\\{title}.mp3"))
-                File.Delete($"f:\\downloads\\{title}.mp3");
+            string invalidCharsPattern = $"[{Regex.Escape(new string(Path.GetInvalidFileNameChars()))}]";
+            title = Regex.Replace(title, invalidCharsPattern, " ");;
             
-            await youtube.Videos.Streams.DownloadAsync(audioStreamInfo, $"f:\\downloads\\{title}.mp3");
-
+            var addRecord = new IndexFileRecord()
+            {
+                ShortName = Path.GetFileName(tempFile),
+                OriginFullPath = title,
+                Keywords = request.Keywords.ToList(),
+                Status = FileStatuses.PENDING
+            };
+            
+            var fas = fileAccess.AddRequest(addRecord);
+            await fas.LocalCopy(tempFile);
+            
+            addRecord.Status = FileStatuses.VALID;
+            indexManager.AddRecord(addRecord);
+            
+            response.Id = addRecord.Id;
             response.Status = Arcus.GRPC.FileStatuses.Valid;
         }
         catch (Exception ex)
         {
-            logger.LogDebug($"Url Handler failed: {ex.Message}");
+            logger.LogError($"Url Handler failed: {ex.Message}");
         }
 
         return await Task.FromResult(response);

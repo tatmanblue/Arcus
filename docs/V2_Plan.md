@@ -47,3 +47,4 @@ The Cli should write plain, clear text to console not structured logging data
 # Underlying Technical
 [SharpGrabber](https://github.com/dotnettools/SharpGrabber)  
 [LibVideo](https://github.com/omansak/libvideo)  
+[YoutubeExplode](https://github.com/Tyrrrz/YoutubeExplode)  
