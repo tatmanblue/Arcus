@@ -3,14 +3,14 @@ using ArcusCli;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Debug;
+using ConsoleLoggerProvider = Microsoft.Extensions.Logging.Console.ConsoleLoggerProvider;
 
 
 var serviceProvider = new ServiceCollection()
     .AddLogging(loggingBuilder =>
     {
         loggingBuilder.ClearProviders();
-        loggingBuilder.AddConsole();
-        loggingBuilder.AddDebug();
+        loggingBuilder.AddProvider(new ArcusCli.ConsoleLoggerProvider());
     })
     .AddTransient<CliConfiguration>()
     .BuildServiceProvider();

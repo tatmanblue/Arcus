@@ -42,7 +42,7 @@ The service GRPC implementation should consume the logic, translating the reques
 
 ## Replace Default logger in CLI
 
-The Cli should write plain, clear text to console not structured logging data
+(__Done__) The Cli should write plain, clear text to console not structured logging data
 
 # Underlying Technical
 [YoutubeExplode](https://github.com/Tyrrrz/YoutubeExplode)  
