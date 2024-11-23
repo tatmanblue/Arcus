@@ -16,16 +16,33 @@ public class ConsoleLogger(string name) : ILogger
         if (!IsEnabled(logLevel)) return;
 
         string message = formatter(state, exception);
+        var originalColor = Console.ForegroundColor;
+        Console.ForegroundColor = GetColorForLogLevel(logLevel);
         Console.WriteLine($"{message}");
+        if (exception != null)
+        {
+            Console.WriteLine($"Exception: {exception}");
+        }
+        Console.ForegroundColor = originalColor;
     }
+
+    private static ConsoleColor GetColorForLogLevel(LogLevel logLevel) => logLevel switch
+    {
+        LogLevel.Error or LogLevel.Critical => ConsoleColor.Red,
+        LogLevel.Warning => ConsoleColor.Yellow,
+        _ => ConsoleColor.Gray
+    };
 }
 
-public class ConsoleLoggerProvider : ILoggerProvider
+public sealed class ConsoleLoggerProvider : ILoggerProvider
 {
     public ILogger CreateLogger(string categoryName)
     {
         return new ConsoleLogger(categoryName);
     }
 
+    /// <summary>
+    /// Required by ILoggingProvider
+    /// </summary>
     public void Dispose() { }
 }

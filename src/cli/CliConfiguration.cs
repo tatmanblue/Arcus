@@ -37,7 +37,7 @@ public class CliConfiguration
         string command = args[0];
         string[] cmdArgs = args.Skip(1).ToArray();
         
-        ILogger<CliConfiguration> logger = serviceProvider.GetService<ILogger<CliConfiguration>>();
+        ILogger<CliConfiguration> ?logger = serviceProvider.GetService<ILogger<CliConfiguration>>();
         logger.LogDebug($"Array Len: {args.Length} for Command: {command} - CMDARGS arguments: {string.Join(" ", cmdArgs)}");
         
         switch (command)
