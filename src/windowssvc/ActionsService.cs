@@ -1,6 +1,11 @@
-﻿using Grpc.Core;          // For gRPC core components like Server, ServerPort
+﻿using System.Net;
+using System.Text.RegularExpressions;
+using Grpc.Core;          // For gRPC core components like Server, ServerPort
 using Google.Protobuf.WellKnownTypes;
 using Arcus.GRPC;
+using ArcusWinSvc.Integrations;
+using YoutubeExplode;
+using YoutubeExplode.Videos.Streams;
 
 
 namespace ArcusWinSvc;
@@ -133,4 +138,60 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
             await responseStream.WriteAsync(response);
         }
     }
+
+    /// <summary>
+    /// Currently the URL command only works on youtube videos.  There is no validation
+    /// the URL is valid etc....
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    public override async Task<UrlResponse> Url(UrlRequest request, ServerCallContext context)
+    {
+        logger.LogDebug($"Url Handler got: {request.Url}");
+
+        var response = new UrlResponse()
+        {
+            Status = Arcus.GRPC.FileStatuses.Error
+        };
+
+        IFileAccessStream fas = null;
+
+        try
+        {
+            (string file, string title) = await new YouTube(request.Url).ExtractAudio();
+
+            string invalidCharsPattern = $"[{Regex.Escape(new string(Path.GetInvalidFileNameChars()))}]";
+            title = Regex.Replace(title, invalidCharsPattern, " ");
+            ;
+
+            var addRecord = new IndexFileRecord()
+            {
+                ShortName = Path.GetFileName(file),
+                OriginFullPath = title,
+                Keywords = request.Keywords.ToList(),
+                Status = FileStatuses.PENDING
+            };
+
+            fas = fileAccess.AddRequest(addRecord);
+            await fas.LocalCopy(file);
+
+            addRecord.Status = FileStatuses.VALID;
+            indexManager.AddRecord(addRecord);
+
+            response.Id = addRecord.Id;
+            response.Status = Arcus.GRPC.FileStatuses.Valid;
+        }
+        catch (Exception ex)
+        {
+            logger.LogError($"Url Handler failed: {ex.Message}");
+        }
+        finally
+        {
+            fas?.Close();
+        }
+
+        return await Task.FromResult(response);
+    }
+    
 }

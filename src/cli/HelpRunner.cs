@@ -34,6 +34,7 @@ public class HelpRunner : IArgumentRunner
         builder.AppendLine("  list");
         builder.AppendLine("  remove --id={id}");
         builder.AppendLine("  update --id={id}");
+        builder.AppendLine("  url --url={url} (optional) --convert={None, MP3}");
         
         return builder.ToString();
     }

@@ -8,6 +8,9 @@
 5. Error handling on both the service and cli
 6. Review PRs and add technical updates like error handling
 7. Add configuration management 
+8. Dynamic injection for URL downloader and type conversion functions
+9. Move service GRPC handlers into separate types
+10. Replace Default logger in CLI
 
 
 ## Support for the Cloud.
@@ -23,8 +26,24 @@ Part of the meta data kept at the service could include checksums, hashes and ot
 Currently files are saved in raw format.  The original intent for XVault was to secure the data from data breaches by encrypting files.  
 
 Little bit of a brain dump on how this might work:  The service itself could through its own autonomy encrypt data.  A breach at the service compromises the entire data store. 
- Adding an onioned layer approach with the CLI providing an already encrypted file protects data at the service level--this adds complexity for sharing files between different CLI and a breach at the client compromises the system.   There may need to be some security between the CLI and the service through service validation of the client prior to allowing api calls, but this adds complexity to setup.
+ Adding an onioned layer approach with the CLI providing an already encrypted file protects data at the service level--this adds complexity for sharing files between different CLI and a breach at the client compromises the system.   There may need to be some security between the CLI and the service through service validation of the client prior to allowing api calls, but this adds complexity to setup.  
 
 ## Configuration  
 
-Some configuration elements are obvious.  Some are specific to CLI or service and others could be shared.  The CLI could provide and update some configuration elements of the service, possibly, or vice versa.
+Some configuration elements are obvious.  Some are specific to CLI or service and others could be shared.  The CLI could provide and update some configuration elements of the service, possibly, or vice versa.  
+
+## Dynamic injection  
+
+On the service side, different urls may need different handlers and conversion options will also have different implementations.  Make this injectable or factory  
+
+## Service GRPC handlers  
+
+The service GRPC implementation should consume the logic, translating the request/response types into data needed by the logic so that the logic is separate from the GRPC handling.  
+
+## Replace Default logger in CLI
+
+The Cli should write plain, clear text to console not structured logging data
+
+# Underlying Technical
+[YoutubeExplode](https://github.com/Tyrrrz/YoutubeExplode)  
+[ffmpeg](https://www.ffmpeg.org/download.html)  
