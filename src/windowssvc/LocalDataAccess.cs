@@ -1,5 +1,6 @@
 ﻿using Arcus.GRPC;
 using ArcusWinSvc.Interfaces;
+using IConfiguration = ArcusWinSvc.Interfaces.IConfiguration;
 
 namespace ArcusWinSvc;
 
@@ -8,7 +9,7 @@ namespace ArcusWinSvc;
 ///
 /// If I continue this project, use interface and blah blah blah
 /// </summary>
-public class LocalDataAccess(Configuration config) : IFileAccess
+public class LocalDataAccess(IConfiguration config) : IFileAccess
 {
     public IFileAccessStream AddRequest(IndexFileRecord record)
     {

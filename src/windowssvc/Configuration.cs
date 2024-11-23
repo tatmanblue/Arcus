@@ -2,32 +2,19 @@
 
 /// <summary>
 /// Opens up the opporunity to change configuration through environment variables etc
+/// TODO: read environment variables for override
 /// </summary>
-public class Configuration
+public class Configuration : ArcusWinSvc.Interfaces.IConfiguration
 {
-    public string IndexFile
-    {
-        get
-        {
-            return GetIndexFile();
-        }
-    }
-    
-    public string IndexFilePath 
-    {
-        get
-        {
-            return GetIndexFilePath();
-        }
-    }
+    public string IndexFile => GetIndexFile();
 
-    public string StoreLocation
-    {
-        get
-        {
-            return GetStoreLocation();
-        }
-    }
+    public string IndexFilePath => GetIndexFilePath();
+
+    public string StoreLocation => GetStoreLocation();
+
+    public int GrpcPort => 5001;
+    
+    public int GrpcMaxMessageSize => 10 * 1024;
 
     private string GetStoreLocation()
     {
