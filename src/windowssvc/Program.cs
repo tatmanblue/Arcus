@@ -1,6 +1,7 @@
 using System.Net;
 using System.Security.Authentication;
 using ArcusWinSvc;
+using ArcusWinSvc.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
@@ -9,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton<IFileAccess, LocalDataAccess>();
 builder.Services.AddSingleton<IIndexFileManager, IndexFileManager>();
+builder.Services.AddSingleton(new Configuration());
 
 builder.Services.AddWindowsService();
 builder.Services.AddHostedService<Worker>();

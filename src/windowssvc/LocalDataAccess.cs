@@ -1,4 +1,5 @@
 ﻿using Arcus.GRPC;
+using ArcusWinSvc.Interfaces;
 
 namespace ArcusWinSvc;
 
@@ -7,11 +8,11 @@ namespace ArcusWinSvc;
 ///
 /// If I continue this project, use interface and blah blah blah
 /// </summary>
-public class LocalDataAccess : IFileAccess
+public class LocalDataAccess(Configuration config) : IFileAccess
 {
     public IFileAccessStream AddRequest(IndexFileRecord record)
     {
-        var dir = $"{GetStoreLocation()}\\{record.Id}";
+        var dir = $"{config.StoreLocation}\\{record.Id}";
         // hard assumption it doesn't already exist, and it is a problem if it is
         // but for this POC, not important enough
         Directory.CreateDirectory(dir);
@@ -21,7 +22,7 @@ public class LocalDataAccess : IFileAccess
 
     public IFileAccessStream GetFileStream(IndexFileRecord record)
     {
-        var dir = $"{GetStoreLocation()}\\{record.Id}";
+        var dir = $"{config.StoreLocation}\\{record.Id}";
         var file = $"{dir}\\{record.Id}.file";
 
         LocalDataAccessStream ldss = new LocalDataAccessStream(file);
@@ -30,23 +31,16 @@ public class LocalDataAccess : IFileAccess
 
     public IFileAccessStream GetRequest(IndexFileRecord record)
     {
-        var dir = $"{GetStoreLocation()}\\{record.Id}";
+        var dir = $"{config.StoreLocation}\\{record.Id}";
         if (false == Directory.Exists(dir))
             throw new DirectoryNotFoundException();
         
         return GetFileStream(record);
     }
-    
-    private string GetStoreLocation()
-    {
-        var path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-        var rootLocation = Path.Combine(path, @"Arcus FS");
-        return Path.Combine(rootLocation, @"Data Store");
-    }
 
     public bool RemoveRequest(IndexFileRecord record)
     {
-        var dir = $"{GetStoreLocation()}\\{record.Id}";
+        var dir = $"{config.StoreLocation}\\{record.Id}";
         if (false == Directory.Exists(dir))
             throw new DirectoryNotFoundException();
         

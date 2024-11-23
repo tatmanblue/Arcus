@@ -4,6 +4,7 @@ using Grpc.Core;          // For gRPC core components like Server, ServerPort
 using Google.Protobuf.WellKnownTypes;
 using Arcus.GRPC;
 using ArcusWinSvc.Integrations;
+using ArcusWinSvc.Interfaces;
 using YoutubeExplode;
 using YoutubeExplode.Videos.Streams;
 

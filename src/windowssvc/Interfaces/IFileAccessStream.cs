@@ -1,4 +1,4 @@
-﻿namespace ArcusWinSvc;
+﻿namespace ArcusWinSvc.Interfaces;
 
 /// <summary>
 /// File store stream knows how to read and write files from the data store

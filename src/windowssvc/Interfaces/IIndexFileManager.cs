@@ -1,4 +1,4 @@
-﻿namespace ArcusWinSvc;
+﻿namespace ArcusWinSvc.Interfaces;
 
 /// <summary>
 /// the Index tells the system how to identify a file in the system

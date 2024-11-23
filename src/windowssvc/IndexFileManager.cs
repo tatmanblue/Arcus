@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using ArcusWinSvc.Interfaces;
 using Newtonsoft.Json;
 
 namespace ArcusWinSvc;
@@ -14,16 +15,18 @@ public class IndexFileManager : IIndexFileManager
 {
     private ConcurrentBag<IndexFileRecord> records = new ();
     private ILogger<IndexFileManager> logger;
+    private Configuration config;
     
     private static readonly object _lock = new object();
     
-    public IndexFileManager(ILogger<IndexFileManager> logger)
+    public IndexFileManager(ILogger<IndexFileManager> logger, Configuration config)
     {
         this.logger = logger;
+        this.config = config;
         string indexFile = GetIndexFile();
         if (!File.Exists(indexFile))
         {
-            string fullPath = GetIndexLocation();
+            string fullPath = config.IndexFilePath;
             logger.LogInformation($"Creating directory: {fullPath}");
             if (!Directory.Exists(fullPath))
                 Directory.CreateDirectory(fullPath);
@@ -37,17 +40,10 @@ public class IndexFileManager : IIndexFileManager
         records = JsonConvert.DeserializeObject<ConcurrentBag<IndexFileRecord>>(fileData);
         this.logger.LogInformation($"Loaded {records.Count} records");
     }
-
-    private string GetIndexLocation()
-    {
-        var path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-        return Path.Combine(path, @"Arcus FS");
-    }
     
     private string GetIndexFile()
     {
-
-        return $"{GetIndexLocation()}\\index.txt";
+        return config.IndexFile;
     }
 
     /// <summary>

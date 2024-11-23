@@ -1,16 +1,18 @@
 # Version 2
 
 ## Ideas/Features
-1. Stream file between CLI and service instead of service copying file directly ___Done___
-2. Support for cloud.  S3 storage, that kind of thing  
-3. Service adds checks for integrity  
-4. Service encodes or encrypts files
-5. Error handling on both the service and cli
-6. Review PRs and add technical updates like error handling
-7. Add configuration management 
-8. Dynamic injection for URL downloader and type conversion functions
-9. Move service GRPC handlers into separate types
-10. Replace Default logger in CLI
+1. Support for cloud.  S3 storage, that kind of thing  
+2. Service adds checks for integrity  
+3. Service encodes or encrypts files
+4. Error handling on both the service and cli
+5. Review PRs and add technical updates like error handling
+6. Add configuration management 
+7. Dynamic injection for URL downloader and type conversion functions
+8. Move service GRPC handlers into separate types
+
+### Completed From list above
+1. Replace Default logger in CLI  ___Done___
+2. Stream file between CLI and service instead of service copying file directly ___Done___
 
 
 ## Support for the Cloud.
@@ -40,9 +42,6 @@ On the service side, different urls may need different handlers and conversion o
 
 The service GRPC implementation should consume the logic, translating the request/response types into data needed by the logic so that the logic is separate from the GRPC handling.  
 
-## Replace Default logger in CLI
-
-(__Done__) The Cli should write plain, clear text to console not structured logging data
 
 # Underlying Technical
 [YoutubeExplode](https://github.com/Tyrrrz/YoutubeExplode)  
