@@ -28,6 +28,7 @@ public class Configuration : ArcusWinSvc.Interfaces.IConfiguration
         get => grpcPort;
         init
         {
+            // ignoring value input since this should not be set in code anyways
             string portStr = Environment.GetEnvironmentVariable(ARCUS_GPRC_PORT) ?? "0";
             if (int.TryParse(portStr, out int portId) && portId > 1024 && portId <= 65535)
                 grpcPort = portId;
@@ -39,6 +40,7 @@ public class Configuration : ArcusWinSvc.Interfaces.IConfiguration
         get => maxMessageSize;
         init
         {
+            // ignoring value input since this should not be set in code anyways   
             string maxSizeStr = Environment.GetEnvironmentVariable(ARCUS_GPRC_PORT) ?? "0";
             if (int.TryParse(maxSizeStr, out int maxSize) && maxSize > 1024)
                 maxMessageSize = maxSize;
