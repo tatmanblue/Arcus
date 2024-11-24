@@ -6,6 +6,7 @@
 /// </summary>
 public class Configuration : ArcusWinSvc.Interfaces.IConfiguration
 {
+    private const string ARCUS_STORE_LOCATION = "ARCUS_STORE_LOC";
     private const string ARCUS_FS_STORE_KEY = "Arcus FS";
     
     public string IndexFile => GetIndexFile();
@@ -20,7 +21,10 @@ public class Configuration : ArcusWinSvc.Interfaces.IConfiguration
 
     private string GetStoreLocation()
     {
-        var path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        var path = Environment.GetEnvironmentVariable(ARCUS_STORE_LOCATION);
+        if (string.IsNullOrEmpty(path))
+            path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        
         var rootLocation = Path.Combine(path, @ARCUS_FS_STORE_KEY);
         return Path.Combine(rootLocation, @"Data Store");
     }
@@ -32,7 +36,10 @@ public class Configuration : ArcusWinSvc.Interfaces.IConfiguration
     
     private string GetIndexFilePath()
     {
-        var path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        var path = Environment.GetEnvironmentVariable(ARCUS_STORE_LOCATION);
+        if (string.IsNullOrEmpty(path))
+            path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+        
         return Path.Combine(path, @ARCUS_FS_STORE_KEY);
     }
 }
