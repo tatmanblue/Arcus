@@ -1,5 +1,7 @@
 ﻿using System.Collections.Concurrent;
+using ArcusWinSvc.Interfaces;
 using Newtonsoft.Json;
+using IConfiguration = ArcusWinSvc.Interfaces.IConfiguration;
 
 namespace ArcusWinSvc;
 
@@ -14,16 +16,17 @@ public class IndexFileManager : IIndexFileManager
 {
     private ConcurrentBag<IndexFileRecord> records = new ();
     private ILogger<IndexFileManager> logger;
+    private IConfiguration config;
     
     private static readonly object _lock = new object();
     
-    public IndexFileManager(ILogger<IndexFileManager> logger)
+    public IndexFileManager(ILogger<IndexFileManager> logger, IConfiguration config)
     {
         this.logger = logger;
-        string indexFile = GetIndexFile();
-        if (!File.Exists(indexFile))
+        this.config = config;
+        if (!File.Exists(config.IndexFile))
         {
-            string fullPath = GetIndexLocation();
+            string fullPath = config.IndexFilePath;
             logger.LogInformation($"Creating directory: {fullPath}");
             if (!Directory.Exists(fullPath))
                 Directory.CreateDirectory(fullPath);
@@ -33,21 +36,9 @@ public class IndexFileManager : IIndexFileManager
         // TODO File operations and JSON deserialization should be wrapped in try-catch blocks to
         // TODO handle potential exceptions gracefully.  See code reviews for PR
         // https://github.com/tatmanblue/Arcus/pull/5
-        string fileData = File.ReadAllText(indexFile);
+        string fileData = File.ReadAllText(config.IndexFile);
         records = JsonConvert.DeserializeObject<ConcurrentBag<IndexFileRecord>>(fileData);
         this.logger.LogInformation($"Loaded {records.Count} records");
-    }
-
-    private string GetIndexLocation()
-    {
-        var path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-        return Path.Combine(path, @"Arcus FS");
-    }
-    
-    private string GetIndexFile()
-    {
-
-        return $"{GetIndexLocation()}\\index.txt";
     }
 
     /// <summary>
@@ -55,7 +46,7 @@ public class IndexFileManager : IIndexFileManager
     /// </summary>
     private void SaveIndexFile()
     {
-        string indexFile = GetIndexFile();
+        string indexFile = config.IndexFile;
         string json = JsonConvert.SerializeObject(records);
         logger.LogInformation($"Saving index file: {indexFile}");
         File.WriteAllText(indexFile, json);

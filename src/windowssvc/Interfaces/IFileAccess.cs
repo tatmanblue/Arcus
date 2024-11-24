@@ -1,4 +1,4 @@
-﻿namespace ArcusWinSvc;
+﻿namespace ArcusWinSvc.Interfaces;
 
 /// <summary>
 /// File store is how files are stored.  For local, this means reading and writing to disk

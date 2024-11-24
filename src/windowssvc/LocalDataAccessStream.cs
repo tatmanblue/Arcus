@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using ArcusWinSvc.Interfaces;
 
 namespace ArcusWinSvc;
 
