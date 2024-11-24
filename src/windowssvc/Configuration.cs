@@ -7,7 +7,7 @@
 public class Configuration : ArcusWinSvc.Interfaces.IConfiguration
 {
     private const string ARCUS_STORE_LOCATION = "ARCUS_STORE_LOC";
-    private const string ARCUS_GPRC_PORT = "ARCUS_GPRC_PORT";
+    private const string ARCUS_GRPC_PORT = "ARCUS_GPRC_PORT";
     private const string ARCUS_FS_STORE_KEY = "Arcus FS";
     
     
@@ -29,7 +29,7 @@ public class Configuration : ArcusWinSvc.Interfaces.IConfiguration
         init
         {
             // ignoring value input since this should not be set in code anyways
-            string portStr = Environment.GetEnvironmentVariable(ARCUS_GPRC_PORT) ?? "0";
+            string portStr = Environment.GetEnvironmentVariable(ARCUS_GRPC_PORT) ?? "0";
             if (int.TryParse(portStr, out int portId) && portId > 1024 && portId <= 65535)
                 grpcPort = portId;
         }
@@ -41,7 +41,7 @@ public class Configuration : ArcusWinSvc.Interfaces.IConfiguration
         init
         {
             // ignoring value input since this should not be set in code anyways   
-            string maxSizeStr = Environment.GetEnvironmentVariable(ARCUS_GPRC_PORT) ?? "0";
+            string maxSizeStr = Environment.GetEnvironmentVariable(ARCUS_GRPC_PORT) ?? "0";
             if (int.TryParse(maxSizeStr, out int maxSize) && maxSize > 1024)
                 maxMessageSize = maxSize;
         }
