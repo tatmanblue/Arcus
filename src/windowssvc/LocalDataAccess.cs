@@ -13,7 +13,7 @@ public class LocalDataAccess(IConfiguration config) : IFileAccess
 {
     public IFileAccessStream AddRequest(IndexFileRecord record)
     {
-        var dir = $"{config.StoreLocation}\\{record.Id}";
+        var dir = Path.Combine(config.StoreLocation, record.Id);
         // hard assumption it doesn't already exist, and it is a problem if it is
         // but for this POC, not important enough
         Directory.CreateDirectory(dir);
@@ -23,8 +23,8 @@ public class LocalDataAccess(IConfiguration config) : IFileAccess
 
     public IFileAccessStream GetFileStream(IndexFileRecord record)
     {
-        var dir = $"{config.StoreLocation}\\{record.Id}";
-        var file = $"{dir}\\{record.Id}.file";
+        var dir = Path.Combine(config.StoreLocation, record.Id);
+        var file = Path.Combine(dir, $"{record.Id}.file");
 
         LocalDataAccessStream ldss = new LocalDataAccessStream(file);
         return ldss;
@@ -32,7 +32,7 @@ public class LocalDataAccess(IConfiguration config) : IFileAccess
 
     public IFileAccessStream GetRequest(IndexFileRecord record)
     {
-        var dir = $"{config.StoreLocation}\\{record.Id}";
+        var dir = Path.Combine(config.StoreLocation, record.Id);
         if (false == Directory.Exists(dir))
             throw new DirectoryNotFoundException();
         
@@ -41,11 +41,11 @@ public class LocalDataAccess(IConfiguration config) : IFileAccess
 
     public bool RemoveRequest(IndexFileRecord record)
     {
-        var dir = $"{config.StoreLocation}\\{record.Id}";
+        var dir = Path.Combine(config.StoreLocation, record.Id);
         if (false == Directory.Exists(dir))
             throw new DirectoryNotFoundException();
         
-        string file = $"{dir}\\{record.Id}.file";
+        var file = Path.Combine(dir, $"{record.Id}.file");
         
         if (false == File.Exists(file))
             throw new FileNotFoundException();
