@@ -6,14 +6,13 @@
 3. Service encodes or encrypts files
 4. Error handling on both the service and cli
 5. Review PRs and add technical updates like error handling
-6. Add configuration management 
-7. Dynamic injection for URL downloader and type conversion functions
-8. Move service GRPC handlers into separate types
+6. Dynamic injection for URL downloader and type conversion functions
+7. Move service GRPC handlers into separate types
 
 ### Completed From list above
 1. Replace Default logger in CLI  ___Done___
 2. Stream file between CLI and service instead of service copying file directly ___Done___
-
+3. Add configuration management __Done__
 
 ## Support for the Cloud.
 
