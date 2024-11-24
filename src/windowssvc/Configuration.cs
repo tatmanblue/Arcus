@@ -8,6 +8,7 @@ public class Configuration : ArcusWinSvc.Interfaces.IConfiguration
 {
     private const string ARCUS_STORE_LOCATION = "ARCUS_STORE_LOC";
     private const string ARCUS_GRPC_PORT = "ARCUS_GPRC_PORT";
+    private const string ARCUS_GRPC_MSG_SIZE = "ARCUS_GRPC_MSG_SIZE";
     private const string ARCUS_FS_STORE_KEY = "Arcus FS";
     
     
@@ -28,9 +29,9 @@ public class Configuration : ArcusWinSvc.Interfaces.IConfiguration
         get => grpcPort;
         init
         {
-            // ignoring value input since this should not be set in code anyways
+            // ignoring value input since this should not be set in code any ways
             string portStr = Environment.GetEnvironmentVariable(ARCUS_GRPC_PORT) ?? "0";
-            if (int.TryParse(portStr, out int portId) && portId > 1024 && portId <= 65535)
+            if (int.TryParse(portStr, out int portId) && portId > 5001 && portId <= 65535)
                 grpcPort = portId;
         }
     }
@@ -40,8 +41,8 @@ public class Configuration : ArcusWinSvc.Interfaces.IConfiguration
         get => maxMessageSize;
         init
         {
-            // ignoring value input since this should not be set in code anyways   
-            string maxSizeStr = Environment.GetEnvironmentVariable(ARCUS_GRPC_PORT) ?? "0";
+            // ignoring value input since this should not be set in code any ways   
+            string maxSizeStr = Environment.GetEnvironmentVariable(ARCUS_GRPC_MSG_SIZE) ?? "0";
             if (int.TryParse(maxSizeStr, out int maxSize) && maxSize > 1024)
                 maxMessageSize = maxSize;
         }
@@ -59,7 +60,7 @@ public class Configuration : ArcusWinSvc.Interfaces.IConfiguration
 
     private string GetIndexFile()
     {
-        return $"{GetIndexFilePath()}\\index.txt";
+        return Path.Combine(GetIndexFilePath(), "index.txt");
     }
     
     private string GetIndexFilePath()
