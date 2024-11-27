@@ -27,7 +27,7 @@ public class LocalFileErase
     public void Erase(string fileName)
     {
         if (!File.Exists(fileName))
-            throw new FileNotFoundException(fileName, "file doesnt exist");
+            throw new FileNotFoundException(fileName, "file doesn't exist");
         if (FileAttributes.Directory == (FileAttributes.Directory & File.GetAttributes(fileName)))
             throw new DirectoryNotFoundException($"cannot open directory for {fileName}");
 

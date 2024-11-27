@@ -15,6 +15,6 @@ public class LocalFileOperations(ILogger<LocalFileOperations> logger, IWorkQueue
     {
         var deleteFile = new LocalFileDeleteRunner(path, fileOperations);
         workRunner.AddRunner(deleteFile);
-        logger.LogInformation($"LFO Deleted {path}");
+        logger.LogInformation($"File deletion job queued for processing: {path}");
     }
 }
