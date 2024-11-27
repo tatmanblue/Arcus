@@ -15,10 +15,11 @@ builder.Services.AddSingleton<ArcusWinSvc.Interfaces.IConfiguration>(config);
 builder.Services.AddSingleton<IFileAccess, LocalDataAccess>();
 builder.Services.AddSingleton<IIndexFileManager, LocalIndexFileManager>();
 builder.Services.AddSingleton<IFileOperations, LocalFileOperations>();
-builder.Services.AddSingleton<IQueueWorkRunner, Worker>();
+builder.Services.AddSingleton<IQueueWorkRunner, QueueWorkRunner>();
+
 
 builder.Services.AddWindowsService();
-builder.Services.AddHostedService<Worker>();
+builder.Services.AddHostedService<QueueWorkRunner>();
 builder.Services.AddGrpc().AddServiceOptions<ActionsServiceImpl>(options =>
 {
     options.MaxReceiveMessageSize = config.GrpcMaxMessageSize;
