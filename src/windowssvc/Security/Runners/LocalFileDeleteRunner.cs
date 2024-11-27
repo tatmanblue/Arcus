@@ -9,6 +9,8 @@ namespace ArcusWinSvc.Security.Runners;
 /// <param name="fileOperations"></param>
 public class LocalFileDeleteRunner(string file, FileOperations fileOperations) : IRunnable
 {
+    public string FriendlyName { get; } = "LocalFileDelete";
+    
     public void Run()
     {
         LocalFileErase erase = new();

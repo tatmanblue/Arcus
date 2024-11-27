@@ -5,5 +5,6 @@
 /// </summary>
 public interface IRunnable
 {
+    string FriendlyName { get; }
     void Run();    
 }

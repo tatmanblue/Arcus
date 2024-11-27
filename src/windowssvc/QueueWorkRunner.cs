@@ -18,11 +18,12 @@ public class QueueWorkRunner(ILogger<QueueWorkRunner> logger) : BackgroundServic
         Task t = factory.StartNew(() => {
             try
             {
+                logger.LogInformation($"Running runner {runner.FriendlyName}");
                 runner.Run();
             }
             catch (Exception ex)
             {
-                logger.LogError(ex, "Failed to run runner");
+                logger.LogError(ex, $"Failed to run runner {runner.FriendlyName}");
             }
             
         }, cts);
@@ -47,7 +48,6 @@ public class QueueWorkRunner(ILogger<QueueWorkRunner> logger) : BackgroundServic
                 continue;
             }
             
-            tasks.ForEach(t => logger.LogInformation("Running task: {task}", t.GetType().Name));
             Task.WaitAll(tasks.ToArray(), stoppingToken);
         }
         
