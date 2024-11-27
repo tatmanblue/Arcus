@@ -12,15 +12,15 @@ namespace ArcusWinSvc;
 /// TODO may want to create an interface this or consume interfaces for reading/write,
 /// TODO especially if I move this to the cloud and will not be using harddrive FS  
 /// </summary>
-public class IndexFileManager : IIndexFileManager
+public class LocalIndexFileManager : IIndexFileManager
 {
     private ConcurrentBag<IndexFileRecord> records = new ();
-    private ILogger<IndexFileManager> logger;
+    private ILogger<LocalIndexFileManager> logger;
     private IConfiguration config;
     
     private static readonly object _lock = new object();
     
-    public IndexFileManager(ILogger<IndexFileManager> logger, IConfiguration config)
+    public LocalIndexFileManager(ILogger<LocalIndexFileManager> logger, IConfiguration config)
     {
         this.logger = logger;
         this.config = config;

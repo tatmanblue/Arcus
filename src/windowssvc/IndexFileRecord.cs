@@ -33,14 +33,3 @@ public class IndexFileRecord
     public FileStatuses Status { get; set; } = FileStatuses.UNKNOWN;
 }
 
-/// <summary>
-/// Not sure if this will be used long term, keeping it here knowing
-/// best practice separates enum out.  This must match the proto
-/// </summary>
-public enum FileStatuses
-{
-    UNKNOWN = 0,
-    PENDING = 1,
-    VALID = 2,
-    ERROR = 3,
-}

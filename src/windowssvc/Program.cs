@@ -2,6 +2,7 @@ using System.Net;
 using System.Security.Authentication;
 using ArcusWinSvc;
 using ArcusWinSvc.Interfaces;
+using ArcusWinSvc.Security;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
@@ -12,7 +13,9 @@ var config = new ArcusWinSvc.Configuration();
 
 builder.Services.AddSingleton<ArcusWinSvc.Interfaces.IConfiguration>(config);
 builder.Services.AddSingleton<IFileAccess, LocalDataAccess>();
-builder.Services.AddSingleton<IIndexFileManager, IndexFileManager>();
+builder.Services.AddSingleton<IIndexFileManager, LocalIndexFileManager>();
+builder.Services.AddSingleton<IFileOperations, LocalFileOperations>();
+builder.Services.AddSingleton<IQueueWorkRunner, Worker>();
 
 builder.Services.AddWindowsService();
 builder.Services.AddHostedService<Worker>();
@@ -39,5 +42,5 @@ host.MapGrpcService<ActionsServiceImpl>();
 
 // Run the host
 host.Run();
-
+ 
 Console.Out.Flush();
