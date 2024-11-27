@@ -1,5 +1,9 @@
 ﻿namespace ArcusWinSvc.Interfaces;
 
+/// <summary>
+/// File operations are more intensive behaviors on data, such as making sure the data
+/// cannot be retrieved after deleting it, or encrypting it
+/// </summary>
 public interface IFileOperations
 {
     /// <summary>

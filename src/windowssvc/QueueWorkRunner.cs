@@ -15,13 +15,24 @@ public class QueueWorkRunner(ILogger<QueueWorkRunner> logger) : BackgroundServic
     public void AddRunner(IRunnable runner)
     {
         logger.LogInformation("Adding runner");
-        Task t = factory.StartNew(runner.Run, cts);
+        Task t = factory.StartNew(() => {
+            try
+            {
+                runner.Run();
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Failed to run runner");
+            }
+            
+        }, cts);
         tasks.Add(t);        
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        taskScheduler = new LimitedConcurrencyLevelTaskScheduler(1);
+        // seems like the threading value should be configurable
+        taskScheduler = new LimitedConcurrencyLevelTaskScheduler(2);
         tasks = new List<Task>();
         factory = new TaskFactory(taskScheduler);
         cts = stoppingToken;

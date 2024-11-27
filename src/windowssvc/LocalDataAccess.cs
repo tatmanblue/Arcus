@@ -9,7 +9,7 @@ namespace ArcusWinSvc;
 ///
 /// If I continue this project, use interface and blah blah blah
 /// </summary>
-public class LocalDataAccess(IConfiguration config) : IFileAccess
+public class LocalDataAccess(IConfiguration config, IFileOperations fileOps) : IFileAccess
 {
     public IFileAccessStream AddRequest(IndexFileRecord record)
     {
@@ -50,8 +50,9 @@ public class LocalDataAccess(IConfiguration config) : IFileAccess
         if (false == File.Exists(file))
             throw new FileNotFoundException();
         
-        File.Delete(file);
-        Directory.Delete(dir);
+        // File.Delete(file);
+        // Directory.Delete(dir);
+        fileOps.Delete(file, FileOperations.ERASE);
         
         return true;
     }
