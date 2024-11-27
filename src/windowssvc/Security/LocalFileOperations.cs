@@ -9,7 +9,7 @@ namespace ArcusWinSvc.Security;
 /// </summary>
 /// <param name="logger"></param>
 /// <param name="workRunner"></param>
-public class LocalFileOperations(ILogger<LocalFileOperations> logger, IQueueWorkRunner workRunner) : IFileOperations
+public class LocalFileOperations(ILogger<LocalFileOperations> logger, IWorkQueue workRunner) : IFileOperations
 {
     public void Delete(string path, FileOperations fileOperations)
     {

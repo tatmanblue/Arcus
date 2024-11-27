@@ -23,5 +23,8 @@ public class LocalFileDeleteRunner(string file, FileOperations fileOperations) :
         erase.Settings.OverwriteSize = 0L;
         
         erase.Erase(file);
+
+        string path = Path.GetDirectoryName(file);
+        Directory.Delete(path, true);
     }
 }

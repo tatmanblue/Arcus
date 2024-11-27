@@ -10,16 +10,16 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 var builder = WebApplication.CreateBuilder(args);
 var config = new ArcusWinSvc.Configuration();
 
-
 builder.Services.AddSingleton<ArcusWinSvc.Interfaces.IConfiguration>(config);
 builder.Services.AddSingleton<IFileAccess, LocalDataAccess>();
 builder.Services.AddSingleton<IIndexFileManager, LocalIndexFileManager>();
 builder.Services.AddSingleton<IFileOperations, LocalFileOperations>();
-builder.Services.AddSingleton<IQueueWorkRunner, QueueWorkRunner>();
-
+builder.Services.AddSingleton<IWorkQueue, WorkQueue>();
 
 builder.Services.AddWindowsService();
-builder.Services.AddHostedService<QueueWorkRunner>();
+builder.Services.AddHostedService<WorkQueueRunner>();
+
+
 builder.Services.AddGrpc().AddServiceOptions<ActionsServiceImpl>(options =>
 {
     options.MaxReceiveMessageSize = config.GrpcMaxMessageSize;
@@ -40,8 +40,6 @@ builder.WebHost.ConfigureKestrel(kestrelOptions =>
 
 var host = builder.Build();
 host.MapGrpcService<ActionsServiceImpl>();
-
-// Run the host
 host.Run();
  
 Console.Out.Flush();
