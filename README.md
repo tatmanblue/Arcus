@@ -8,6 +8,9 @@ Applications and services to securely store files, accessed remotely and locally
 2. [Version 2](docs/V2_Plan.md) Whats next?      
 3. [Architecture](docs/arch.md) provides design notes, albeit rather vague atm  
 
+## Installing and using 
+There is nearly no documentation on this topic, yet.  Feel free to reach out to me or create a github issue and I will work with you.  There is a start of a [./doc](https://github.com/tatmanblue/Arcus/blob/main/docs/INSTALL_USE.md) but it is pretty terse at the moment.
+
 ## Issue tracking
 
 All issues are tracked in YouTrack.   Will consider shifting to github issues, if there are public contributions.  
