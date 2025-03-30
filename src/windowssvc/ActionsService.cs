@@ -164,7 +164,6 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
 
             string invalidCharsPattern = $"[{Regex.Escape(new string(Path.GetInvalidFileNameChars()))}]";
             title = Regex.Replace(title, invalidCharsPattern, " ");
-            ;
 
             var addRecord = new IndexFileRecord()
             {
