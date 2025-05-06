@@ -6,7 +6,8 @@ Applications and services to securely store files, accessed remotely and locally
 ## Versions, ideas, plans
 1. [Version 1](docs/V1_Plan.md) serves as a POC.  Calling this ___DONE___
 2. [Version 2](docs/V2_Plan.md) Whats next?      
-3. [Architecture](docs/arch.md) provides design notes, albeit rather vague atm  
+3. [Version 3] Add mobile device support
+4. [Architecture](docs/arch.md) provides design notes, albeit rather vague atm  
 
 ## Installing and using 
 There is nearly no documentation on this topic, yet.  Feel free to reach out to me or create a [github issue](https://github.com/tatmanblue/Arcus/issues) and I will work with you.  There is a start of a [install/use doc](https://github.com/tatmanblue/Arcus/blob/main/docs/INSTALL_USE.md) but it is pretty terse at the moment.
