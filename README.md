@@ -1,5 +1,6 @@
 # Arcus
-Applications and services to securely store files, accessed remotely and locally.  
+Arcus is a vault for files.  While there are commerically available solutions, Arcus was designed as a research and POC and originated from a resurrected idea of long ago.  
+The Arcus solution comprises of applications and services to securely store files, accessed remotely and locally.  
 
 
 
@@ -29,4 +30,4 @@ If you have any questions about the content of the repository, please email [mat
 ## Status
 Ideation -- limited updates at this time -- this project is created to explore the idea.  
 
-2024.11.10
+2025.05.10
