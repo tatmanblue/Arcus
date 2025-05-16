@@ -1,5 +1,6 @@
 # Arcus
-Arcus is a vault for files.  While there are commerically available solutions, Arcus was designed as a research and POC and originated from a resurrected idea of long ago.  
+Arcus is a secure vault for files with the intention that it will run on any OS capable of running dotnet core applications.  While there are commerically available solutions, Arcus was designed as a research and POC and originated from a [resurrected idea of long ago](https://github.com/tatmanblue/Arcus?tab=readme-ov-file#history).  
+
 The Arcus solution comprises of applications and services to securely store files, accessed remotely and locally.  
 
 
