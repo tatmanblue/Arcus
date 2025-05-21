@@ -1,5 +1,30 @@
+# Android/IntelliJ
+*.iml
+.gradle/
+build/
+local.properties
+*.keystore
+captures/
+.externalNativeBuild/
+.cxx/
+*.log
+
+# OS generated
+.DS_Store
+Thumbs.db
+
+# Kotlin/Java
+*.class
+
+# Android Studio
+.idea/
+*.ipr
+*.iws
+
+# User-specific
+*.DotSettings.user
+
+# Others
 obj/
 bin/
-.idea/
 temp/
-*.DotSettings.user

@@ -9,3 +9,5 @@ patterns and interfaces as the CLI.
 - [ ] File download
 - [ ] File delete, locally and from service
 - [ ] Automatic push or notification of new files
+- [ ] Service has ability to watch for new files and add, notify.  Probably use some type of plugin model
+
