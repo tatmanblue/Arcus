@@ -8,7 +8,8 @@ The Arcus solution comprises of applications and services to securely store file
 ## Versions, ideas, plans
 1. [Version 1](docs/V1_Plan.md) serves as a POC.  Calling this ___DONE___
 2. [Version 2](docs/V2_Plan.md) Whats next?      
-3. [Version 3] Add mobile device support
+3. [Version 3](docs/Mobile_Plan.md) Add mobile device support
+4. [Version 4] Integration with [IronBar](https://github.com/tatmanblue/ironbar)  
 4. [Architecture](docs/arch.md) provides design notes, albeit rather vague atm  
 
 ## Installing and using 
@@ -20,7 +21,7 @@ All issues are tracked in YouTrack.   Will consider shifting to github issues, i
 1. [YouTrack](https://tatmangames.youtrack.cloud/agiles/159-6/current)  
 
 ## History
-This project is a possible reincaration or version two of [XVault](https://github.com/tatmanblue/xvault).  I never got very far with XVault and not sure why I stopped working on it.  After reading an 
+This project is a reincaration of the idea or version two of [XVault](https://github.com/tatmanblue/xvault).  I never got very far with XVault and not sure why I stopped working on it.  After reading an 
 intriging real life story, recently, I started thinking about this project again.  XVault was an idea created 20 yrs ago around the idea of keeping data
 safe from "hackers".  Today, this idea is more relevant.
 
