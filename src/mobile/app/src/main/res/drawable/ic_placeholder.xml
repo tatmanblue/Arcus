@@ -1,0 +1,12 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <rect
+        android:x="3dp"
+        android:y="3dp"
+        android:width="18dp"
+        android:height="18dp"
+        android:fillColor="#FFAAAAAA"/>
+</vector>
