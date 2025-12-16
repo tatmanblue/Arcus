@@ -4,6 +4,10 @@
 App on mobile device is able to send and recieve files from a Arcus Service using the same
 patterns and interfaces as the CLI.
 
+Since Arcus Service already supports gRPC, the preference is the mobile app can use gRPC to communicate with the service.
+
+There are a couple of other options as documented in [watch_list.md](watch_list.md).
+
 ## Features
 - [ ] File upload
 - [ ] File download
