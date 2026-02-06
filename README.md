@@ -1,4 +1,5 @@
 # Arcus
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/tatmanblue/Arcus)  
 
 Arcus is a secure vault for files. Arcus is designed to run on any OS capable of running dotnet core applications. It supports networking multiple arcus clients with an arcus server.  While there are commercially available solutions, Arcus was designed as a research and POC and originated from a [resurrected idea of long ago](https://github.com/tatmanblue/Arcus?tab=readme-ov-file#history).
 
