@@ -1,4 +1,3 @@
-﻿using System.Diagnostics.CodeAnalysis;
 using ArcusWinSvc.Interfaces;
 
 namespace ArcusWinSvc;
@@ -7,25 +6,31 @@ namespace ArcusWinSvc;
 /// Reads and writes content to/from files sent via GRPC or created by the service to
 /// the local storage area
 /// </summary>
-public class LocalDataAccessStream(string file) : IFileAccessStream, IDisposable
+public class LocalDataAccessStream(string file, IStreamCipher cipher) : IFileAccessStream, IDisposable
 {
-    private FileStream fileStream = null;
+    private Stream? fileStream = null;
 
     public async Task WriteBytes(byte[] chunk)
     {
         if (null == fileStream)
-            fileStream = new FileStream(file, FileMode.Create, FileAccess.Write);
-        
+        {
+            var raw = new FileStream(file, FileMode.Create, FileAccess.Write);
+            fileStream = cipher.WrapForWrite(raw);
+        }
+
         await fileStream.WriteAsync(chunk);
     }
 
     public async Task<int> ReadBytes(byte[] chunk, int chunkSize)
     {
         if (null == fileStream)
-            fileStream = new FileStream(file, FileMode.Open, FileAccess.Read);
+        {
+            var raw = new FileStream(file, FileMode.Open, FileAccess.Read);
+            fileStream = cipher.WrapForRead(raw);
+        }
 
         int bytesRead = await fileStream.ReadAsync(chunk, 0, chunkSize);
-        
+
         return bytesRead;
     }
 
@@ -37,15 +42,15 @@ public class LocalDataAccessStream(string file) : IFileAccessStream, IDisposable
     {
         if (File.Exists(file))
             File.Delete(file);
-        
-        await using (FileStream sourceStream = File.Open(source, FileMode.Open))
+
+        await using FileStream sourceStream = File.Open(source, FileMode.Open);
+        var destinationRaw = File.Create(file);
+        // destinationStream (the cipher wrapper) takes ownership of disposing destinationRaw
+        await using (Stream destinationStream = cipher.WrapForWrite(destinationRaw))
         {
-            await using (FileStream destinationStream = File.Create(file))
-            {
-                await sourceStream.CopyToAsync(destinationStream);
-            }
+            await sourceStream.CopyToAsync(destinationStream);
         }
-        
+
         File.Delete(source);
     }
 
@@ -55,9 +60,9 @@ public class LocalDataAccessStream(string file) : IFileAccessStream, IDisposable
         fileStream?.Dispose();
         fileStream = null;
     }
-    
+
     public void Dispose()
     {
-        fileStream?.Close();   
+        fileStream?.Close();
     }
 }
