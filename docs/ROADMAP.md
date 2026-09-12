@@ -21,7 +21,7 @@ Use cases identified for this roadmap:
 | 2 | **Agent-to-agent file sharing** — an agentic coding assistant writes a file to its local Briefcase instance; the Briefcase pushes it to the Arcus server; other Briefcase instances on other machines detect it and surface it to their own agents. | Given |
 | 3 | **Multi-device personal vault** — a user's files (documents, configs, notes) stay in sync across every device they own without manual copying, functioning as the spiritual successor to XVault. | Derived from vision statement |
 | 4 | **Secure sharing between people** — one user deliberately shares a file or folder with another Arcus user/instance, with encryption in transit and at rest so a compromised transport or intermediary can't read the content. | Derived from V2_Plan security notes |
-| 5 | **Tamper-evident transfer history** — an auditable, cryptographically verifiable record of what files moved where and when, useful for compliance-sensitive or high-trust scenarios. | Enabled by potential IronBar integration |
+| 5 | **Tamper-evident transfer history** — an auditable, cryptographically verifiable record of what files moved where and when, useful for compliance-sensitive or high-trust scenarios. | Enabled by optional IronBar integration (metadata/integrity ledger) |
 | 6 | **URL-sourced content ingestion** — pulling in and normalizing content from external URLs (YouTube today, generic web content planned) directly into the vault. | Existing `Url` RPC + V2_Plan |
 
 Use cases 1–3 are the core value proposition and should drive near-term priority. Use cases 4–6 depend on
@@ -48,7 +48,7 @@ Gaps are grouped by theme rather than by project, since most of them block more 
 - No integrity verification (checksums/hashes) on stored files.
 
 **Platform reach**
-- The service is architecturally and literally named `ArcusWinSvc` (a Windows Service). This conflicts with the "any OS" goal implied by the mobile plan and `arch.md`'s "local storage, os independent" option. No Linux/macOS service equivalent exists.
+- The service's core logic is currently built directly on top of the Windows Service hosting model (`ArcusWinSvc`), with no separation between "what the service does" and "how it's hosted." Per the resolved decision above, Windows keeps its native Windows Service host, but Linux/macOS need their own idiomatic host — which requires extracting the core logic first. No Linux/macOS host exists yet.
 - The mobile app cannot yet perform any vault operation — it's UI scaffolding only.
 
 **Automation**
@@ -63,14 +63,36 @@ Gaps are grouped by theme rather than by project, since most of them block more 
 - No code or design connects Arcus to the Briefcase or to IronBar yet. Both integrations are currently only mentioned in planning docs (this one, and IronBar's `WORK.md`).
 - The Briefcase has no notion of a remote Arcus backend — its file operations are 100% local-filesystem today.
 
-## 4. Open Decisions to Resolve
+## 4. Open Decisions
 
-These need an answer before the phases below can be scoped in detail:
+Decision #1 has been resolved (see below); the remainder still need an answer before the phases below can be
+scoped in detail.
 
-1. **Windows-only vs. cross-platform service** — does `ArcusWinSvc` get generalized/rehosted for Linux/macOS, or does a new cross-platform host get built alongside it? This blocks Phase B below and affects the mobile app's usefulness (a Windows-only backend limits the phone-sync use case to "phone talks to a PC that must stay on").
+1. ~~Windows-only vs. cross-platform service~~ — **Resolved:** Windows keeps its native Windows Service host
+   (`ArcusWinSvc`); other OSes are not forced into that model. Linux and macOS should each host the service the
+   way that's idiomatic there (e.g. a systemd unit, a launchd daemon, or simply a long-running process/container),
+   rather than building one lowest-common-denominator host for every platform. This implies the core service
+   logic (file operations, indexing, gRPC handling) needs to be decoupled from the Windows Service host wrapper
+   it's currently built directly on top of, so each platform's host is a thin shell around the same logic.
 2. **Encryption ownership** — client-side (onion-layered, protects against a compromised service but complicates sharing) vs. service-side (simpler, but a service breach exposes everything)? V2_Plan raises both without resolving it.
-3. **IronBar's role** — is it a transfer-audit ledger sitting alongside the existing vault storage, a storage backend in its own right, or both? This determines whether Phase E depends on IronBar's own storage-abstraction work (`WORK.md` goal: flexible storage) landing first.
-4. **Briefcase relationship** — does Arcus become one of the Briefcase's storage backends (alongside its planned cloud backends), or does the Briefcase remain local-only and simply gain an Arcus-aware sync/notification layer bolted on top? This changes where the integration code lives.
+3. ~~IronBar's role~~ — **Resolved:** IronBar is optional and additive, never required for core Arcus
+   functionality. Its role is a metadata/integrity ledger — a tamper-evident, BFT-backed copy of file metadata
+   (checksums, version history, transfer records) that gives a guarantee Arcus's own local metadata can't: multiple
+   independent nodes attesting a record hasn't been altered after the fact. Arcus's own integrity checks (Phase A)
+   and encryption remain fully self-contained and IronBar-independent — a widely-wanted use case (#4, secure
+   sharing) must not depend on an optional project that's currently prototype-stage with irregular updates. If
+   IronBar later audits anything encryption-related, the narrower and safer target is key-rotation/access-grant
+   history, not gating whether encryption is usable at all. Whether IronBar also becomes a storage backend in its
+   own right is explicitly deferred — a separate decision to revisit only after the metadata-ledger integration
+   proves out, rather than taking on both integration shapes at once.
+4. ~~Briefcase relationship~~ — **Resolved:** Arcus becomes a storage backend for the Briefcase, using the same
+   storage-backend abstraction point the Briefcase's own roadmap already reserves for its planned cloud backends
+   (S3, OneDrive, Google Drive, etc.) — Arcus is simply another backend behind that same seam, not a special
+   case. The Briefcase remains the sole agent-facing surface (its existing `list_files`/`read_file`/`create_file`/
+   `search_files`/notifications/projects tools); agents continue talking only to the Briefcase and never to Arcus
+   directly. This was chosen over giving Arcus its own MCP server (the pattern IronBar uses for its ledger)
+   specifically because it matches the use case as originally scoped — Briefcase-to-Briefcase sync via Arcus —
+   rather than introducing a second, overlapping agent-facing tool surface.
 
 ## 5. Roadmap Phases
 
@@ -84,10 +106,11 @@ trust boundaries (other machines, other agents, a public ledger) and shouldn't b
 unencrypted foundation.
 
 ### Phase B — Cross-Platform Service & Real Mobile Client
-Resolve Open Decision #1 and get the service running cross-platform (or stand up a parallel host); wire the
-Android app's existing screens to actual gRPC calls (upload/download/list/delete). Depends on: Open Decision #1.
-Blocks: use case #1 (phone-side sync has no cross-platform value if the service can't run near where the user
-actually is) and use case #3.
+Extract the service's core logic from the Windows Service host it's currently built on, so it can be re-hosted:
+keep the native Windows Service host as-is, and add an idiomatic host per other OS (systemd unit or equivalent
+long-running process on Linux, launchd daemon on macOS). Also wire the Android app's existing screens to actual
+gRPC calls (upload/download/list/delete). Depends on: Open Decision #1 (resolved). Blocks: use case #1 (phone-side
+sync has no cross-platform value if the service can't run near where the user actually is) and use case #3.
 
 ### Phase C — Automation (Watchers & Push)
 Add client-side folder watching (detect new downloads) and a push/notification path from service to clients
@@ -97,16 +120,24 @@ Phase B (needs working clients on both ends). Enables: use case #1 fully, and is
 for #2.
 
 ### Phase D — Briefcase Integration
-Resolve Open Decision #4, then implement the sync path described in use case #2: Briefcase writes propagate to
-an Arcus server, and other Briefcase instances detect and surface them to their agents. Depends on: Phase C
-(this is fundamentally the same watch-and-notify problem, applied across a Briefcase↔Arcus boundary instead of
-Arcus client↔client).
+Per Open Decision #4 (resolved), this phase has two parts: (1) the Briefcase needs a storage-backend abstraction
+built — it doesn't have one today, it's local-filesystem-only — the same seam its own roadmap earmarks for cloud
+backends, so this benefits the Briefcase independent of Arcus; (2) implement Arcus as one such backend, giving
+the sync path described in use case #2: a Briefcase instance's file operations flow through to an Arcus server,
+and other Briefcase instances (each still the sole interface their own agents use) detect and surface the change.
+Depends on: Phase C (this is fundamentally the same watch-and-notify problem, applied across a Briefcase↔Arcus
+boundary instead of Arcus client↔client).
 
-### Phase E — IronBar Integration
-Resolve Open Decision #3. At minimum, record a tamper-evident log of file transfers (use case #5) via IronBar's
-ledger; optionally use IronBar as a storage backend if its own storage-abstraction goals mature first. Depends
-on: Phase A (a meaningful audit trail requires the transfers being audited to already be authenticated) and,
-if pursued as a storage backend, on IronBar's own in-progress "flexible storage" goal (see its `WORK.md`).
+### Phase E — IronBar Integration (Optional)
+Per Open Decision #3 (resolved), implement IronBar strictly as an optional, additive metadata/integrity ledger:
+if configured, Arcus writes checksums, version history, and transfer records to IronBar's ledger (use case #5);
+if not configured, Arcus behaves exactly as it does without IronBar — nothing about core Arcus functionality,
+including its own encryption and integrity checks from Phase A, depends on IronBar being present. The integration
+should be a single narrow seam (e.g. an interface Arcus calls into, no-op when IronBar isn't configured) so
+IronBar's concepts don't leak into core storage/transfer logic. IronBar-as-storage-backend is explicitly out of
+scope for this phase — revisit only after the ledger integration has proven out, rather than taking on both
+integration shapes at once. Depends on: Phase A (a meaningful audit trail requires the data being audited to
+already be authenticated and integrity-checked at the source).
 
 ### Phase F — Cloud Storage Backends
 Add S3/Azure Blob (or similar) as a storage option for the vault, as originally scoped in `V2_Plan.md`. Depends
