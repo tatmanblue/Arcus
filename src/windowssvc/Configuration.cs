@@ -18,9 +18,6 @@ public class Configuration : ArcusWinSvc.Interfaces.IConfiguration
     private const int DEFAULT_GRPC_PORT = 5001;
     private const int DEFAULT_MAX_MESSAGE_SIZE = 10 * 1024;
     
-    private int grpcPort = DEFAULT_GRPC_PORT;
-    private int maxMessageSize = DEFAULT_MAX_MESSAGE_SIZE;
-    
     public string IndexFile => GetIndexFile();
 
     public string IndexFilePath => GetIndexFilePath();
@@ -39,28 +36,30 @@ public class Configuration : ArcusWinSvc.Interfaces.IConfiguration
         return raw.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
     }
 
-    public int GrpcPort
+    public int GrpcPort => GetGrpcPort();
+
+    public int GrpcMaxMessageSize => GetGrpcMaxMessageSize();
+
+    private static int GetGrpcPort()
     {
-        get => grpcPort;
-        init
-        {
-            // ignoring value input since this should not be set in code any ways
-            string portStr = Environment.GetEnvironmentVariable(ARCUS_GRPC_PORT) ?? "0";
-            if (int.TryParse(portStr, out int portId) && portId > 5001 && portId <= 65535)
-                grpcPort = portId;
-        }
+        // Note: this was previously an `init`-only property with this same logic in its
+        // init accessor -- which never ran, since Program.cs constructs this class with
+        // `new Configuration()` and no object initializer. ARCUS_GPRC_PORT was silently
+        // ignored. Now a plain computed getter, like every other setting in this class.
+        string portStr = Environment.GetEnvironmentVariable(ARCUS_GRPC_PORT) ?? string.Empty;
+        if (int.TryParse(portStr, out int portId) && portId > 5001 && portId <= 65535)
+            return portId;
+
+        return DEFAULT_GRPC_PORT;
     }
 
-    public int GrpcMaxMessageSize
+    private static int GetGrpcMaxMessageSize()
     {
-        get => maxMessageSize;
-        init
-        {
-            // ignoring value input since this should not be set in code any ways   
-            string maxSizeStr = Environment.GetEnvironmentVariable(ARCUS_GRPC_MSG_SIZE) ?? "0";
-            if (int.TryParse(maxSizeStr, out int maxSize) && maxSize > 1024)
-                maxMessageSize = maxSize;
-        }
+        string maxSizeStr = Environment.GetEnvironmentVariable(ARCUS_GRPC_MSG_SIZE) ?? string.Empty;
+        if (int.TryParse(maxSizeStr, out int maxSize) && maxSize > 1024)
+            return maxSize;
+
+        return DEFAULT_MAX_MESSAGE_SIZE;
     }
 
     private string GetStoreLocation()
