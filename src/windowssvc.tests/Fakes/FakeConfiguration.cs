@@ -17,4 +17,6 @@ public class FakeConfiguration : IConfiguration
     public string? TlsCertificatePath { get; init; }
 
     public string? TlsCertificatePassword { get; init; }
+
+    public IReadOnlyCollection<string> ApiKeys { get; init; } = Array.Empty<string>();
 }

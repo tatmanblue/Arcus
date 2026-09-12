@@ -1,4 +1,6 @@
 using Microsoft.Extensions.Logging;
+using Grpc.Core;
+using Grpc.Core.Interceptors;
 using Grpc.Net.Client;
 using Arcus.GRPC;
 
@@ -12,6 +14,7 @@ public abstract class AbstractBaseRunner<T> : IDisposable, IArgumentRunner where
 {
     private const string ARCUS_SERVICE_URL = "ARCUS_SERVICE_URL";
     private const string ARCUS_SERVICE_TLS_THUMBPRINT = "ARCUS_SERVICE_TLS_THUMBPRINT";
+    private const string ARCUS_API_KEY = "ARCUS_API_KEY";
 
     /// <summary>Preserves today's behavior when ARCUS_SERVICE_URL is unset.</summary>
     public const string DefaultServiceUrl = "http://localhost:5001";
@@ -30,6 +33,7 @@ public abstract class AbstractBaseRunner<T> : IDisposable, IArgumentRunner where
 
         string serviceUrl = Environment.GetEnvironmentVariable(ARCUS_SERVICE_URL) ?? DefaultServiceUrl;
         string? pinnedThumbprint = Environment.GetEnvironmentVariable(ARCUS_SERVICE_TLS_THUMBPRINT);
+        string? apiKey = Environment.GetEnvironmentVariable(ARCUS_API_KEY);
 
         var channelOptions = new GrpcChannelOptions();
         if (!string.IsNullOrWhiteSpace(pinnedThumbprint))
@@ -42,7 +46,8 @@ public abstract class AbstractBaseRunner<T> : IDisposable, IArgumentRunner where
         }
 
         channel = GrpcChannel.ForAddress(serviceUrl, channelOptions);
-        client = new ActionsService.ActionsServiceClient(channel);
+        CallInvoker invoker = channel.CreateCallInvoker().Intercept(new ApiKeyClientInterceptor(apiKey));
+        client = new ActionsService.ActionsServiceClient(invoker);
     }
 
     public abstract void Run();

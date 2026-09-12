@@ -24,4 +24,11 @@ public interface IConfiguration
 
     /// <summary>Password for TlsCertificatePath, if the certificate requires one.</summary>
     public string? TlsCertificatePassword { get; }
+
+    /// <summary>
+    /// Pre-shared API keys clients must present (one per client, so any single key can be
+    /// revoked later without affecting the others). Empty disables enforcement entirely --
+    /// matches every other Phase A security control being opt-in.
+    /// </summary>
+    public IReadOnlyCollection<string> ApiKeys { get; }
 }

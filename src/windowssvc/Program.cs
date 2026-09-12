@@ -19,12 +19,16 @@ builder.Services.AddSingleton<IFileOperations, LocalFileOperations>();
 builder.Services.AddSingleton<IWorkQueue, WorkQueue>();
 builder.Services.AddSingleton<IKeyProvider, FileKeyProvider>();
 builder.Services.AddSingleton<IStreamCipherFactory, StreamCipherFactory>();
+builder.Services.AddSingleton<ApiKeyAuthInterceptor>();
 
 builder.Services.AddWindowsService();
 builder.Services.AddHostedService<WorkQueueRunner>();
 
 
-builder.Services.AddGrpc().AddServiceOptions<ActionsServiceImpl>(options =>
+builder.Services.AddGrpc(options =>
+{
+    options.Interceptors.Add<ApiKeyAuthInterceptor>();
+}).AddServiceOptions<ActionsServiceImpl>(options =>
 {
     options.MaxReceiveMessageSize = config.GrpcMaxMessageSize;
 });
