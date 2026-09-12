@@ -3,6 +3,7 @@ using System.Security.Authentication;
 using ArcusWinSvc;
 using ArcusWinSvc.Interfaces;
 using ArcusWinSvc.Security;
+using ArcusWinSvc.Security.Ciphers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
@@ -15,6 +16,8 @@ builder.Services.AddSingleton<IFileAccess, LocalDataAccess>();
 builder.Services.AddSingleton<IIndexFileManager, LocalIndexFileManager>();
 builder.Services.AddSingleton<IFileOperations, LocalFileOperations>();
 builder.Services.AddSingleton<IWorkQueue, WorkQueue>();
+builder.Services.AddSingleton<IKeyProvider, FileKeyProvider>();
+builder.Services.AddSingleton<IStreamCipherFactory, StreamCipherFactory>();
 
 builder.Services.AddWindowsService();
 builder.Services.AddHostedService<WorkQueueRunner>();
