@@ -145,3 +145,20 @@ The four areas above touch overlapping files, so build them in this order rather
 - **Cross-platform hosting (Phase B).** This phase's TLS/key-storage choices should avoid Windows-only
   assumptions baked into core logic (keep cert/key loading behind the same kind of interface used elsewhere), but
   actually building non-Windows hosts is Phase B's job, not this one's.
+
+## 7. Known Gaps to Address Later
+
+Unlike §6, these weren't decided up front -- they're gaps noticed while implementing steps 1-3, deliberately left
+alone rather than fixed in passing, since they're bigger than the step that surfaced them.
+
+- **The CLI has no centralized configuration, unlike the server.** `windowssvc` centralizes all its `ARCUS_*`
+  settings behind `IConfiguration`/`Configuration`, injected via DI. The CLI has no equivalent:
+  `AbstractBaseRunner` reads `ARCUS_SERVICE_URL`/`ARCUS_SERVICE_TLS_THUMBPRINT` directly via
+  `Environment.GetEnvironmentVariable`, with the env var names as `private const` fields hidden inside that one
+  class. (`CliConfiguration.cs` is *not* this -- despite the similar name, it's argument-parsing/runner-dispatch
+  logic, not a settings class.) A follow-up should add an analogous `ICliSettings`/`CliSettings` exposing
+  `ServiceUrl`, `TlsThumbprint`, and step 4's upcoming API key as properties, passed into `AbstractBaseRunner<T>`'s
+  constructor instead of read inline. Note the CLI doesn't fully resolve runners through DI today --
+  `CliConfiguration.GetRunner` constructs each one manually (e.g.
+  `new ListRunner(serviceProvider.GetService<ILogger<ListRunner>>())`) -- so the natural fit is one more
+  manually-passed constructor argument at each call site, not a DI registration change.

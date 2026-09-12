@@ -12,6 +12,7 @@ public class Configuration : ArcusWinSvc.Interfaces.IConfiguration
     private const string ARCUS_FS_STORE_KEY = "Arcus FS";
     private const string ARCUS_TLS_CERT_PATH = "ARCUS_TLS_CERT_PATH";
     private const string ARCUS_TLS_CERT_PASSWORD = "ARCUS_TLS_CERT_PASSWORD";
+    private const string ARCUS_API_KEYS = "ARCUS_API_KEYS";
     
     
     private const int DEFAULT_GRPC_PORT = 5001;
@@ -29,6 +30,14 @@ public class Configuration : ArcusWinSvc.Interfaces.IConfiguration
     public string? TlsCertificatePath => Environment.GetEnvironmentVariable(ARCUS_TLS_CERT_PATH);
 
     public string? TlsCertificatePassword => Environment.GetEnvironmentVariable(ARCUS_TLS_CERT_PASSWORD);
+
+    public IReadOnlyCollection<string> ApiKeys => GetApiKeys();
+
+    private static IReadOnlyCollection<string> GetApiKeys()
+    {
+        string raw = Environment.GetEnvironmentVariable(ARCUS_API_KEYS) ?? string.Empty;
+        return raw.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+    }
 
     public int GrpcPort
     {
