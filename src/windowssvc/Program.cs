@@ -1,5 +1,6 @@
 using System.Net;
 using System.Security.Authentication;
+using System.Security.Cryptography.X509Certificates;
 using ArcusWinSvc;
 using ArcusWinSvc.Interfaces;
 using ArcusWinSvc.Security;
@@ -29,13 +30,24 @@ builder.Services.AddGrpc().AddServiceOptions<ActionsServiceImpl>(options =>
 });
 builder.WebHost.ConfigureKestrel(kestrelOptions =>
 {
-    // Setup a HTTP/2 endpoint without TLS.  This is for listening for GRPC calls
-    kestrelOptions.Listen(IPAddress.Any, config.GrpcPort, o =>
+    // TLS is enabled only when a certificate is configured (ARCUS_TLS_CERT_PATH). Left
+    // unconfigured, this keeps today's cleartext HTTP/2 (h2c) behavior, so a purely local,
+    // single-machine setup needs no extra configuration to keep working.
+    kestrelOptions.Listen(IPAddress.Any, config.GrpcPort, listenOptions =>
     {
-        o.Protocols = HttpProtocols.Http2;
+        listenOptions.Protocols = HttpProtocols.Http2;
+
+        if (!string.IsNullOrWhiteSpace(config.TlsCertificatePath))
+        {
+            var certificate = new X509Certificate2(config.TlsCertificatePath, config.TlsCertificatePassword);
+            listenOptions.UseHttps(certificate);
+        }
     });
     kestrelOptions.ConfigureHttpsDefaults(o =>
     {
+        // SslProtocols.None lets the OS choose the most secure available protocol -- the
+        // documented, recommended value, not a literal "off" switch. It only takes effect
+        // on endpoints that actually call UseHttps(), i.e. only once TLS is configured above.
         o.SslProtocols = SslProtocols.None;
     });
 });

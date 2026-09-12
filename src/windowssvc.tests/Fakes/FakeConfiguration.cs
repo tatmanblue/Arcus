@@ -13,4 +13,8 @@ public class FakeConfiguration : IConfiguration
     public int GrpcPort { get; init; } = 5001;
 
     public int GrpcMaxMessageSize { get; init; } = 10 * 1024;
+
+    public string? TlsCertificatePath { get; init; }
+
+    public string? TlsCertificatePassword { get; init; }
 }
