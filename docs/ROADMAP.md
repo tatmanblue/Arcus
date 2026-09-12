@@ -43,7 +43,8 @@ foundational work landing first (see Phases, below).
 Gaps are grouped by theme rather than by project, since most of them block more than one use case.
 
 **Security**
-- No encryption at rest or in transit. V2_Plan documents two candidate models (service-side vs. client-side/onion-layered encryption) but no decision has been made.
+- No encryption at rest. Resolved direction: service-side (Model 1) first, behind a swappable interface so client-side encryption (Model 2) can be added later — see Open Decision #2.
+- No encryption in transit — and not merely unconfigured: the gRPC endpoint explicitly disables TLS today (`SslProtocols.None` in `windowssvc/Program.cs`).
 - No authentication or authorization between CLI/mobile clients and the service — any client that can reach the gRPC endpoint can act on the vault.
 - No integrity verification (checksums/hashes) on stored files.
 
@@ -65,8 +66,8 @@ Gaps are grouped by theme rather than by project, since most of them block more 
 
 ## 4. Open Decisions
 
-Decision #1 has been resolved (see below); the remainder still need an answer before the phases below can be
-scoped in detail.
+All four decisions below have been resolved; kept here (rather than folded away) since the reasoning behind
+each still matters for scoping the phases that depend on them.
 
 1. ~~Windows-only vs. cross-platform service~~ — **Resolved:** Windows keeps its native Windows Service host
    (`ArcusWinSvc`); other OSes are not forced into that model. Linux and macOS should each host the service the
@@ -74,7 +75,15 @@ scoped in detail.
    rather than building one lowest-common-denominator host for every platform. This implies the core service
    logic (file operations, indexing, gRPC handling) needs to be decoupled from the Windows Service host wrapper
    it's currently built directly on top of, so each platform's host is a thin shell around the same logic.
-2. **Encryption ownership** — client-side (onion-layered, protects against a compromised service but complicates sharing) vs. service-side (simpler, but a service breach exposes everything)? V2_Plan raises both without resolving it.
+2. ~~Encryption ownership~~ — **Resolved:** Service-side encryption at rest (Model 1) for now — the service
+   encrypts files it stores; clients send plaintext to the service. Designed so client-side/onion-layered
+   encryption (Model 2) can be layered in later without a rearchitecture: at-rest encryption should sit behind a
+   swappable interface (consistent with the existing `Interfaces/` pattern in `windowssvc`) so "who holds the key"
+   can change later without touching storage/transfer plumbing. Encryption *in transit* is a separate, lower-risk
+   concern handled at the transport layer via TLS on the gRPC channel — not a payload-level decision — but note
+   this isn't automatic: the gRPC endpoint currently configures Kestrel with `SslProtocols.None` (see
+   `windowssvc/Program.cs`), i.e. TLS is explicitly disabled today, not merely unconfigured. Enabling it is
+   in-scope, ordinary work for Phase A.
 3. ~~IronBar's role~~ — **Resolved:** IronBar is optional and additive, never required for core Arcus
    functionality. Its role is a metadata/integrity ledger — a tamper-evident, BFT-backed copy of file metadata
    (checksums, version history, transfer records) that gives a guarantee Arcus's own local metadata can't: multiple
@@ -100,10 +109,12 @@ Phases are ordered by dependency, not calendar time. Later phases assume earlier
 complete, since they build on top of the trust and automation model established earlier.
 
 ### Phase A — Security & Integrity Hardening
-Encrypt data at rest and in transit; add client/service authentication; add integrity checks (checksums/hashes)
-on stored files. Depends on: Open Decision #2. Blocks: Phase D and E, both of which involve sharing data across
-trust boundaries (other machines, other agents, a public ledger) and shouldn't be built on an unauthenticated,
-unencrypted foundation.
+Per Open Decision #2 (resolved): add service-side encryption at rest, behind a swappable interface so client-side
+encryption can be layered in later without touching storage/transfer code; enable TLS on the gRPC transport
+(currently explicitly disabled — `SslProtocols.None` in `windowssvc/Program.cs` — this is ordinary configuration
+work, not an open design question). Also add client/service authentication and integrity checks (checksums/hashes)
+on stored files. Blocks: Phase D and E, both of which involve sharing data across trust boundaries (other
+machines, other agents, a public ledger) and shouldn't be built on an unauthenticated, unencrypted foundation.
 
 ### Phase B — Cross-Platform Service & Real Mobile Client
 Extract the service's core logic from the Windows Service host it's currently built on, so it can be re-hosted:
