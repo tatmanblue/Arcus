@@ -15,4 +15,13 @@ public interface IConfiguration
     
     [Range(1024, int.MaxValue, ErrorMessage = "gRPC message size must be at least 1KB")]
     public int GrpcMaxMessageSize { get; init; }
+
+    /// <summary>
+    /// Path to a certificate (.pfx) to enable TLS on the gRPC endpoint. Null/empty keeps
+    /// today's cleartext HTTP/2 behavior -- TLS is opt-in, not required.
+    /// </summary>
+    public string? TlsCertificatePath { get; }
+
+    /// <summary>Password for TlsCertificatePath, if the certificate requires one.</summary>
+    public string? TlsCertificatePassword { get; }
 }
