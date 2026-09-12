@@ -28,8 +28,19 @@ public class IndexFileRecord
     public List<string> Keywords { get; set; } = new();
     /// <summary>
     /// indicates status. example may not want deleted to physcially deleted until
-    /// a specific command removes it 
+    /// a specific command removes it
     /// </summary>
     public FileStatuses Status { get; set; } = FileStatuses.UNKNOWN;
+    /// <summary>
+    /// SHA-256 hex digest of the file's bytes, computed when the file is written.
+    /// Empty for records that predate integrity checksums; a missing checksum is not
+    /// treated as a failure, just as unverifiable.
+    /// </summary>
+    public string Checksum { get; set; } = string.Empty;
+    /// <summary>
+    /// Identifies which cipher (if any) produced the stored bytes for this record.
+    /// Always "none" until encryption at rest is implemented.
+    /// </summary>
+    public string CipherVersion { get; set; } = "none";
 }
 

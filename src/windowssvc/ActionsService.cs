@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using Grpc.Core;          // For gRPC core components like Server, ServerPort
 using Google.Protobuf.WellKnownTypes;
@@ -74,7 +75,8 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
     {
         IndexFileRecord addRecord = null;
         IFileAccessStream fas = null;
-        
+        using IncrementalHash hasher = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+
         try
         {
             // Read the incoming file stream from the client
@@ -98,10 +100,14 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
                     fas = fileAccess.AddRequest(addRecord);
                 }
 
-                // Write the current chunk to the file
-                await fas.WriteBytes(currentRequest.ChunkData.ToByteArray());
+                // Write the current chunk to the file, hashing the same bytes so
+                // integrity checking doesn't require a second read of the file later
+                byte[] chunk = currentRequest.ChunkData.ToByteArray();
+                hasher.AppendData(chunk);
+                await fas.WriteBytes(chunk);
             }
-            
+
+            addRecord.Checksum = Convert.ToHexString(hasher.GetHashAndReset()).ToLowerInvariant();
             addRecord.Status = FileStatuses.VALID;
             indexManager.AddRecord(addRecord);
 
@@ -123,20 +129,37 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
         ServerCallContext context)
     {
         IndexFileRecord record = indexManager.GetRecord(request.Id);
-        
+
         using IFileAccessStream fas = fileAccess.GetRequest(record);
+        using IncrementalHash hasher = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
 
         var buffer = new byte[8192];                // 8KB buffer size, TODO get from config
         int bytesRead;
 
         while ((bytesRead = await fas.ReadBytes(buffer, buffer.Length)) > 0)
         {
+            hasher.AppendData(buffer, 0, bytesRead);
+
             var response = new GetResponse()
             {
                 ChunkData = Google.Protobuf.ByteString.CopyFrom(buffer, 0, bytesRead)
             };
 
             await responseStream.WriteAsync(response);
+        }
+
+        // A record with no checksum predates integrity checking and is not verifiable -- that's
+        // fine, not a failure. Verification necessarily happens after the chunks above have already
+        // been streamed to the caller (the hash isn't final until the last byte is read), so a
+        // mismatch here still fails the RPC but can't stop bytes already sent.
+        if (!string.IsNullOrEmpty(record.Checksum))
+        {
+            string actualChecksum = Convert.ToHexString(hasher.GetHashAndReset()).ToLowerInvariant();
+            if (!string.Equals(actualChecksum, record.Checksum, StringComparison.OrdinalIgnoreCase))
+            {
+                logger.LogError($"Checksum mismatch for file {record.Id}: expected {record.Checksum}, got {actualChecksum}");
+                throw new RpcException(new Status(StatusCode.DataLoss, $"Stored file failed integrity verification: {record.Id}"));
+            }
         }
     }
 
@@ -165,12 +188,20 @@ public class ActionsServiceImpl : ActionsService.ActionsServiceBase
             string invalidCharsPattern = $"[{Regex.Escape(new string(Path.GetInvalidFileNameChars()))}]";
             title = Regex.Replace(title, invalidCharsPattern, " ");
 
+            // Hash before LocalCopy, which deletes the source file once it's copied into the store
+            string checksum;
+            await using (var sourceStream = File.OpenRead(file))
+            {
+                checksum = Convert.ToHexString(await SHA256.HashDataAsync(sourceStream)).ToLowerInvariant();
+            }
+
             var addRecord = new IndexFileRecord()
             {
                 ShortName = Path.GetFileName(file),
                 OriginFullPath = title,
                 Keywords = request.Keywords.ToList(),
-                Status = FileStatuses.PENDING
+                Status = FileStatuses.PENDING,
+                Checksum = checksum
             };
 
             fas = fileAccess.AddRequest(addRecord);
