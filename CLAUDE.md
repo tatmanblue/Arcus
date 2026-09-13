@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Arcus is a secure vault for files built on .NET 8.0. It uses a client-server architecture over gRPC for storing and retrieving files locally or remotely. This is a resurrection of XVault (a ~20-year-old project) and serves as a research POC for secure file storage.
+Arcus is a secure vault for files built on .NET 10.0. It uses a client-server architecture over gRPC for storing and retrieving files locally or remotely. This is a resurrection of XVault (a ~20-year-old project) and serves as a research POC for secure file storage.
 
 ## Instructions for Claude
 
@@ -42,7 +42,7 @@ gradlew.bat build    # Windows
 
 ## Key Tech
 
-- **.NET 8.0** — CLI client and Windows service
+- **.NET 10.0** — CLI client and Windows service
 - **gRPC** — Client-server communication (streaming for file transfers)
 - **Protocol Buffers** — `src/grpc/ActionsService.proto` defines the service contract
 - **Kotlin/Compose** — Android mobile app
