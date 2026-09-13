@@ -2,6 +2,8 @@
 
 __NOTE__ assumes you know how to run dotnet applications from the command line.  Someday, there will be better info.
 
+There is some better documentation on [DeepWiki](https://deepwiki.com/tatmanblue/Arcus/1.2-getting-started:-installation-and-usage)   
+
 ## Separate downloads
 
 None at this time
