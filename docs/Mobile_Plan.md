@@ -15,3 +15,7 @@ There are a couple of other options as documented in [watch_list.md](watch_list.
 - [ ] Automatic push or notification of new files
 - [ ] Service has ability to watch for new files and add, notify.  Probably use some type of plugin model
 
+
+
+---
+_Document version: 2026/09/19_

@@ -34,3 +34,7 @@ Version 1 serves as POC the project is interesting enough to continue.
 [Grpic Wrapper](https://github.com/protobuf-net/protobuf-net.Grpc)  
 
 Project structure is defined on as AS NEEDED basis.  This means it may not always follow best practices.  Get over it.
+
+
+---
+_Document version: 2026/09/19_
