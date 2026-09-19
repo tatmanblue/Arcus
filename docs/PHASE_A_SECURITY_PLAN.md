@@ -288,4 +288,4 @@ follow-up work, not commitments.
     implementations are built.
 
 ---
-_Document version: 2026/09/19_
+_Version: 2026.09.19_
