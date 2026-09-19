@@ -15,6 +15,11 @@ None at this time
 4. run it
 5. TBF -- how to setup the service via commandline
 
+## Requirements
+
+- .NET 10 SDK to build (all projects target `net10.0`); the .NET 10 runtime to run.
+- Run the tests with `dotnet test src/Arcus.sln` (xUnit projects: `windowssvc.tests`, `cli.tests`).
+
 ## Configuration
 
 All configuration is via environment variables. Nothing needs to be set to run
@@ -41,4 +46,28 @@ means "off" or "use the default," never a required setup step.
 | `ARCUS_SERVICE_URL` | `http://localhost:5001` | The service endpoint to connect to. Use `https://` when the service has TLS enabled. |
 | `ARCUS_SERVICE_TLS_THUMBPRINT` | *(none)* | Pins the server certificate to this thumbprint -- needed when connecting over `https://` to a self-signed certificate, which otherwise fails default certificate validation. |
 | `ARCUS_API_KEY` | *(none)* | The single API key this client presents. Must match one of the service's configured `ARCUS_API_KEYS`. |
+
+## Security notes
+
+Every security control above is **off by default** so a local install works with no setup. For anything beyond a
+single trusted machine, be aware of the following (details in
+[PHASE_A_SECURITY_PLAN.md](PHASE_A_SECURITY_PLAN.md), section 8):
+
+- **Use TLS whenever you use API keys.** The key is sent as ordinary request metadata, so over plain `http://` it
+  is readable on the network. Set `ARCUS_TLS_CERT_PATH` on the service and use an `https://` `ARCUS_SERVICE_URL`.
+- **The service listens on all network interfaces**, not only loopback. With TLS and API keys unset, anyone who can
+  reach the port can use the vault.
+- **Double-check the value of `ARCUS_ENCRYPTION_ALGORITHM`.** An unrecognized value currently falls back to `none`
+  without warning, so a typo means files are stored unencrypted.
+- **The encryption key must be exactly 32 raw bytes** (AES-256) in the file named by `ARCUS_ENCRYPTION_KEY_FILE`. A
+  missing or wrong-sized key is only reported the first time a file is added or read, not at startup. Back the key
+  file up separately from the vault: losing or replacing it makes previously encrypted files unreadable, and there is
+  no key rotation yet.
+- **The index file is not encrypted.** File names, origin paths, keywords and checksums are stored in plaintext even
+  when file contents are encrypted.
+- **A download that fails its integrity check** is reported as an error by the CLI, but the corrupt file may remain
+  at the destination path. Delete it and do not use it.
+
+---
+_Document version: 2026/09/19_
 

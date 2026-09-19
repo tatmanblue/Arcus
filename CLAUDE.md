@@ -15,10 +15,12 @@ All changes must be approved before creating these changes.  Please prepare a pl
 src/
 ├── Arcus.sln
 ├── cli/           # ArcusCli — command-line client
+├── cli.tests/     # xUnit tests for the CLI
 ├── grpc/          # Shared Protocol Buffer definitions
 ├── windowssvc/    # ArcusWinSvc — Windows service (gRPC server)
+├── windowssvc.tests/ # xUnit tests for the service (parallelization disabled — tests set ARCUS_* env vars)
 └── mobile/        # Android app (Kotlin/Compose)
-docs/              # Project documentation and version plans
+docs/              # ROADMAP.md (direction and phasing), PHASE_A_SECURITY_PLAN.md, INSTALL_USE.md
 .github/workflows/ # CI/CD pipelines
 ```
 
@@ -55,6 +57,8 @@ gradlew.bat build    # Windows
 - Service maintains a local file index (`LocalIndexFileManager`) and storage backend (`LocalDataAccess`)
 - A work queue (`WorkQueue`) handles async operations
 - URL handlers (YouTube, generic) live under `windowssvc/Integrations/`
+- Security (Phase A, all opt-in and off by default) lives under `windowssvc/Security/`: `IStreamCipher` implementations in `Ciphers/` (`none`, `aes-256-gcm`), `FileKeyProvider` (`IKeyProvider`), and `ApiKeyAuthInterceptor`; the CLI has the matching `ApiKeyClientInterceptor` and `PinnedThumbprintValidator`
+- Each `IndexFileRecord` carries a plaintext SHA-256 `Checksum` (verified on `Get`) and a `CipherVersion` — reads always use the cipher recorded on the record, never the currently configured one
 
 ## gRPC Service Methods
 
@@ -70,9 +74,10 @@ Defined in `src/grpc/ActionsService.proto`:
 
 ## Configuration
 
-- `src/cli/appsettings.json` — CLI logging/connection config
-- `src/windowssvc/appsettings.json` — Service config (storage paths, ports)
+- `src/cli/appsettings.json` — CLI logging config
+- `src/windowssvc/appsettings.json` — Service logging/host config
 - `src/windowssvc/Properties/launchSettings.json` — Dev launch profiles
+- Service and CLI behavior (store path, port, encryption, TLS, API keys, service URL) is configured through `ARCUS_*` environment variables, not appsettings — see `docs/INSTALL_USE.md` for the full list. Note the port variable is spelled `ARCUS_GPRC_PORT` in the code (pre-existing typo)
 
 ## CI/CD
 
@@ -89,8 +94,11 @@ Defined in `src/grpc/ActionsService.proto`:
 ## Versioning Roadmap
 
 - **V1** (complete) — Core vault operations: add, remove, get, list
-- **V2** (in progress) — Cloud storage, encryption, error handling, URL/YouTube downloads
-- **V3** (started) — Android mobile app
+- **V2** (in progress) — Integrity checks, optional encryption at rest, optional TLS, and API-key auth are done (Phase A); cloud storage and error handling remain; URL/YouTube downloads work
+- **V3** (started) — Android mobile app (UI scaffold only, no gRPC client yet)
 - **V4** (planned) — IronBar integration
 
-See `docs/` for detailed version plans.
+`docs/ROADMAP.md` is the source of truth for phasing (it replaced the older per-version plan docs); `docs/PHASE_A_SECURITY_PLAN.md` §8 lists known follow-up issues in the shipped security work.
+
+---
+_Document version: 2026/09/19_
