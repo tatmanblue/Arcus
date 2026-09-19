@@ -69,5 +69,5 @@ single trusted machine, be aware of the following (details in
   at the destination path. Delete it and do not use it.
 
 ---
-_Document version: 2026/09/19_
+_Version: 2026.09.19_
 

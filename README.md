@@ -50,5 +50,5 @@ If you have any questions about the content of the repository, please email [mat
 Active research POC -- V1 complete; V2 security work (Phase A) implemented and opt-in, with follow-up hardening tracked in the docs.  Limited updates -- this project is created to explore the idea.
 
 ---
-_Document version: 2026/09/19_
+_Version: 2026.09.19_
 

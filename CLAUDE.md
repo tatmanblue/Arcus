@@ -101,4 +101,4 @@ Defined in `src/grpc/ActionsService.proto`:
 `docs/ROADMAP.md` is the source of truth for phasing (it replaced the older per-version plan docs); `docs/PHASE_A_SECURITY_PLAN.md` §8 lists known follow-up issues in the shipped security work.
 
 ---
-_Document version: 2026/09/19_
+_Version: 2026.09.19_
