@@ -60,7 +60,7 @@ like `Stream WrapForWrite(Stream underlying)` / `Stream WrapForRead(Stream under
 **Algorithm selection is configurable, not hardcoded:** introduce e.g. `ARCUS_ENCRYPTION_ALGORITHM`, following the
 `ARCUS_*` env var convention already in `Configuration.cs`, read by a small factory that resolves the configured
 name to an `IStreamCipher` and registers it in DI. This is the same "dynamic injection/factory" pattern
-`V2_Plan.md` already called for on the URL/conversion-handler side — applied here instead of invented fresh.
+the original V2 plan already called for on the URL/conversion-handler side — applied here instead of invented fresh.
 Default is `none`; a deployment opts in to `aes-256-gcm` (or a later algorithm) explicitly. Adding a second real
 algorithm later (e.g. ChaCha20-Poly1305) means one more `IStreamCipher` implementation and one more factory case
 — no change to call sites in `LocalDataAccessStream`.
@@ -262,7 +262,7 @@ follow-up work, not commitments.
    names, origin paths, keywords, and the SHA-256 of each file's *plaintext* unencrypted, even when file contents
    are encrypted — anyone who can read the index can confirm whether a known file is in the vault. The index is also
    not integrity-protected: an attacker with write access to the store can alter a file *and* its recorded checksum
-   together (the limitation `V2_Plan.md` already anticipated; IronBar, Phase E, is the intended answer).
+   together (a limitation the original V2 plan already anticipated; IronBar, Phase E, is the intended answer).
 
 **Correctness / usability**
 

@@ -20,7 +20,7 @@ src/
 ├── windowssvc/    # ArcusWinSvc — Windows service (gRPC server)
 ├── windowssvc.tests/ # xUnit tests for the service (parallelization disabled — tests set ARCUS_* env vars)
 └── mobile/        # Android app (Kotlin/Compose)
-docs/              # Project documentation and version plans
+docs/              # ROADMAP.md (direction and phasing), PHASE_A_SECURITY_PLAN.md, INSTALL_USE.md
 .github/workflows/ # CI/CD pipelines
 ```
 
@@ -98,7 +98,7 @@ Defined in `src/grpc/ActionsService.proto`:
 - **V3** (started) — Android mobile app (UI scaffold only, no gRPC client yet)
 - **V4** (planned) — IronBar integration
 
-See `docs/` for detailed version plans. `docs/ROADMAP.md` is the current source of truth for phasing; `docs/PHASE_A_SECURITY_PLAN.md` §8 lists known follow-up issues in the shipped security work.
+`docs/ROADMAP.md` is the source of truth for phasing (it replaced the older per-version plan docs); `docs/PHASE_A_SECURITY_PLAN.md` §8 lists known follow-up issues in the shipped security work.
 
 ---
 _Document version: 2026/09/19_

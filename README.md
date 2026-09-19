@@ -9,12 +9,11 @@ The Arcus solution comprises of applications and services to securely store file
 
 ## Versions, ideas, plans
 
-1. [Version 1](docs/V1_Plan.md) serves as a POC.  Calling this ***DONE***
-2. [Version 2](docs/V2_Plan.md) Whats next?  Bit's and pieces have been completed now.  Integrity checksums, optional encryption at rest, optional TLS and API-key authentication are implemented (see [Phase A security plan](docs/PHASE_A_SECURITY_PLAN.md)); cloud storage and error handling are still open.
-3. [Version 3](docs/Mobile_Plan.md) Add mobile device support
+1. Version 1 served as a POC.  Calling this ***DONE***
+2. Version 2: whats next?  Bit's and pieces have been completed now.  Integrity checksums, optional encryption at rest, optional TLS and API-key authentication are implemented (see [Phase A security plan](docs/PHASE_A_SECURITY_PLAN.md)); cloud storage and error handling are still open.
+3. Version 3: add mobile device support
 4. \[Version 4] Integration with [IronBar](https://github.com/tatmanblue/ironbar)
-5. [Architecture](docs/arch.md) provides design notes, albeit rather vague atm  
-6. [Roadmap](docs/ROADMAP.md) is the current source of truth for direction and phasing, and supersedes the version plans above  
+5. [Roadmap](docs/ROADMAP.md) is the source of truth for direction, phasing and open issues, and replaces the earlier per-version plan documents  
 
 
 

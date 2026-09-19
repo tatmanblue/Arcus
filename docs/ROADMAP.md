@@ -1,8 +1,8 @@
 # Arcus Roadmap
 
-This document supersedes `arch.md`, `V1_Plan.md`, `V2_Plan.md`, `Mobile_Plan.md`, and `watch_list.md` as the
-source of truth for where Arcus is headed. Those files remain for historical context but should not be
-treated as current planning.
+This document is the single source of truth for where Arcus is headed. It replaces the earlier `arch.md`,
+`V1_Plan.md`, `V2_Plan.md`, `Mobile_Plan.md`, and `watch_list.md`, which were removed once their still-relevant
+content was folded in here (see §7); they remain available in the git history.
 
 This is a roadmap, not an implementation plan: it identifies use cases, the gaps standing between Arcus and
 those use cases, open decisions that need to be made, and the dependency order projects should be tackled in.
@@ -20,9 +20,9 @@ Use cases identified for this roadmap:
 | 1 | **Purchased-file auto-sync** — a user downloads an MP3 on their PC; the Arcus client detects the download and uploads it; a mobile Arcus app detects the new file and pulls it into the phone's music folder. | Given |
 | 2 | **Agent-to-agent file sharing** — an agentic coding assistant writes a file to its local Briefcase instance; the Briefcase pushes it to the Arcus server; other Briefcase instances on other machines detect it and surface it to their own agents. | Given |
 | 3 | **Multi-device personal vault** — a user's files (documents, configs, notes) stay in sync across every device they own without manual copying, functioning as the spiritual successor to XVault. | Derived from vision statement |
-| 4 | **Secure sharing between people** — one user deliberately shares a file or folder with another Arcus user/instance, with encryption in transit and at rest so a compromised transport or intermediary can't read the content. | Derived from V2_Plan security notes |
+| 4 | **Secure sharing between people** — one user deliberately shares a file or folder with another Arcus user/instance, with encryption in transit and at rest so a compromised transport or intermediary can't read the content. | Derived from the original V2 security notes |
 | 5 | **Tamper-evident transfer history** — an auditable, cryptographically verifiable record of what files moved where and when, useful for compliance-sensitive or high-trust scenarios. | Enabled by optional IronBar integration (metadata/integrity ledger) |
-| 6 | **URL-sourced content ingestion** — pulling in and normalizing content from external URLs (YouTube today, generic web content planned) directly into the vault. | Existing `Url` RPC + V2_Plan |
+| 6 | **URL-sourced content ingestion** — pulling in and normalizing content from external URLs (YouTube today, generic web content planned) directly into the vault. | Existing `Url` RPC |
 
 Use cases 1–3 are the core value proposition and should drive near-term priority. Use cases 4–6 depend on
 foundational work landing first (see Phases, below).
@@ -31,10 +31,10 @@ foundational work landing first (see Phases, below).
 
 | Project | Status | Notes |
 |---|---|---|
-| **Arcus core (cli + windowssvc)** | V1 complete, V2 partial | `List`/`Add`/`Get`/`Remove`/`Url` all implemented over gRPC with streaming (8KB chunks). Config management and CLI logging replacement are done. **Phase A landed (PRs #15–#18):** SHA-256 integrity checksums, optional AES-256-GCM encryption at rest, optional TLS with a configurable CLI endpoint, and API-key client authentication — all opt-in and off by default. All projects now target .NET 10, with xUnit test projects for both the service and CLI. Cloud storage, dynamic URL/conversion handlers, and structured error handling are still only described in `V2_Plan.md` — no code exists for them yet. See `PHASE_A_SECURITY_PLAN.md` §8 for follow-up issues found in the shipped Phase A code. |
+| **Arcus core (cli + windowssvc)** | V1 complete, V2 partial | `List`/`Add`/`Get`/`Remove`/`Url` all implemented over gRPC with streaming (8KB chunks). Config management and CLI logging replacement are done. **Phase A landed (PRs #15–#18):** SHA-256 integrity checksums, optional AES-256-GCM encryption at rest, optional TLS with a configurable CLI endpoint, and API-key client authentication — all opt-in and off by default. All projects now target .NET 10, with xUnit test projects for both the service and CLI. Cloud storage, dynamic URL/conversion handlers, and structured error handling are not yet implemented. See `PHASE_A_SECURITY_PLAN.md` §8 for follow-up issues found in the shipped Phase A code. |
 | **Mobile (Android)** | V3 started | Gradle/Compose project scaffolded with `Splash`, `ListFiles`, `Settings`, and `Standard` screens. No gRPC client wiring found — the app does not yet talk to the service. Once it does, it must support the Phase A controls (API key header, TLS, pinned self-signed certificate). |
 | **Security** | Phase A implemented, opt-in | `windowssvc/Security/` now holds the AES-256-GCM cipher (`Ciphers/`), `FileKeyProvider`, and `ApiKeyAuthInterceptor` alongside the local file erase helpers. Nothing is enabled by default: files are still stored raw, and the gRPC endpoint is cleartext and unauthenticated, until `ARCUS_ENCRYPTION_ALGORITHM`, `ARCUS_TLS_CERT_PATH`, and `ARCUS_API_KEYS` are set (see `INSTALL_USE.md`). Authentication is a shared-key list, not mutual TLS. Known gaps: no key rotation/key ID, no OS-native key storage, plaintext index — see `PHASE_A_SECURITY_PLAN.md` §8. |
-| **Integrations** | Single-purpose | Only `YouTube.cs` exists under `windowssvc/Integrations/`; no generic URL handler, no factory/plugin pattern despite being called out in V2_Plan. |
+| **Integrations** | Single-purpose | Only `YouTube.cs` exists under `windowssvc/Integrations/`; no generic URL handler, no factory/plugin pattern despite having been planned since V2. |
 | **the-briefcase** | Mature (v2.1), but Arcus-unaware | Full MCP file server: list/read/create/update/search/archive, project grouping, file-watcher-driven change notifications, local web UI. Its own roadmap already lists cloud storage backends and a plugin architecture as open items. It has no concept of Arcus today — the sync-between-instances use case (#2) is net-new work on both sides. |
 | **IronBar** | Prototype | Distributed ledger (BFT, boot/child nodes), pluggable via `IPlugin`, has its own MCP server exposing ledger operations to agents. Its `WORK.md` explicitly lists **"Integrate with Arcus"** as a possible extension — this is a mutually-acknowledged integration, not one-sided. |
 
@@ -57,8 +57,12 @@ Gaps are grouped by theme rather than by project, since most of them block more 
 - No config push/sync between CLI and service, despite being raised as a V2 idea.
 
 **Extensibility**
-- URL ingestion is hardcoded to a single YouTube handler. V2_Plan calls for a dynamic/injectable handler and conversion-type factory; none exists.
+- URL ingestion is hardcoded to a single YouTube handler. The original V2 plan called for a dynamic/injectable handler and conversion-type factory; none exists.
 - No plugin model on the Arcus side, unlike IronBar (`IPlugin`) and the Briefcase's planned plugin architecture.
+
+**Code health** (carried forward from the original V2 plan; not tied to a use case, but they make everything else safer to build)
+- No structured error handling on either side. The service returns results or throws inconsistently, and the CLI has no consistent way to surface failures — for example, a download that fails its integrity check leaves the corrupt file at the destination.
+- `ActionsServiceImpl` mixes gRPC request/response translation with the vault logic itself. Moving the logic into separate types the gRPC handlers call would decouple it from the transport, and is a natural first step of the host-extraction work in Phase B.
 
 **Cross-project integration**
 - No code or design connects Arcus to the Briefcase or to IronBar yet. Both integrations are currently only mentioned in planning docs (this one, and IronBar's `WORK.md`).
@@ -161,7 +165,7 @@ integration shapes at once. Depends on: Phase A (a meaningful audit trail requir
 already be authenticated and integrity-checked at the source).
 
 ### Phase F — Cloud Storage Backends
-Add S3/Azure Blob (or similar) as a storage option for the vault, as originally scoped in `V2_Plan.md`. Depends
+Add S3/Azure Blob (or similar) as a storage option for the vault, as originally scoped for V2. Depends
 on: Phase A (don't hand raw, unencrypted files to a third-party cloud provider) and benefits from — but doesn't
 strictly require — Phase D, since a shared cloud backend would also simplify the Briefcase's own planned cloud
 storage support.
@@ -171,11 +175,28 @@ storage support.
 These were raised in existing docs and remain relevant candidates; carried forward rather than re-litigated:
 
 - **gRPC** + [protobuf-net.Grpc](https://github.com/protobuf-net/protobuf-net.Grpc) — existing transport, continues as-is.
-- **Cloud storage**: S3 vs. Azure Blob (see `V2_Plan.md`'s comparison link); [Aspire](https://learn.microsoft.com/en-us/dotnet/aspire/) as a possible orchestration layer, notably also used by IronBar for multi-node local dev.
+- **Cloud storage**: S3 vs. Azure Blob ([comparison](https://cloudmounter.net/amazon-s3-vs-google-cloud-storage/)); [Aspire](https://learn.microsoft.com/en-us/dotnet/aspire/) as a possible orchestration layer, notably also used by IronBar for multi-node local dev.
 - **URL ingestion**: [YoutubeExplode](https://github.com/Tyrrrz/YoutubeExplode) (already in use), [ffmpeg](https://www.ffmpeg.org/download.html) for conversions.
 - **Reference for sync UX**: [LocalSend](https://github.com/localsend/localsend) — comparable cross-platform file-transfer tool, worth studying for the "detect and push" interaction model in Phase C.
 - **Minio** — mentioned in IronBar's own storage roadmap as an abstraction over S3/Azure/GCS; worth evaluating jointly if Phase F and IronBar's storage work end up sharing infrastructure.
 
+
+## 7. Carried Forward from Earlier Docs
+
+`arch.md`, `V1_Plan.md`, `V2_Plan.md`, `Mobile_Plan.md`, and `watch_list.md` were removed once this roadmap
+superseded them (they remain in the git history). What was still worth keeping:
+
+- **Project principle:** Arcus stays open source and is not a commercial product.
+- **V1 (complete):** a proof of concept — a command-line client talking gRPC to a Windows service, with `add`,
+  `remove`, `get`, and `list`. Files were stored raw with no security, which Phase A has since started to address.
+  V1 "nice to have" ideas that never shipped: an `update` command, a local `erase` command, and a `config` command
+  for sending settings to the service.
+- **Open V2 items now tracked above:** cloud storage (Phase F), dynamic URL/conversion handlers (Extensibility gap),
+  error handling and separating gRPC handlers from vault logic (Code health gap). Encryption, integrity checks, and
+  client validation from the same list were delivered by Phase A.
+- **Dropped:** the storage-mechanism brainstorm in `arch.md` (Windows-only vs. OS-independent vs. hosted vs. cloud vs.
+  blockchain-backed) is superseded by Open Decision #1 and Phases B and F. Its "Rust or C++ for cryptography" and
+  Unity-UI ideas were not pursued; encryption uses .NET's built-in `AesGcm`.
 
 ---
 _Document version: 2026/09/19_
